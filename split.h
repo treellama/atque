@@ -21,10 +21,17 @@
 #ifndef SPLIT_H
 #define SPLIT_H
 
+#include <stdexcept>
 #include <string>
 
 namespace atque 
 {
+	class split_error : public std::runtime_error
+	{
+	public:
+		split_error(const std::string& what) : std::runtime_error(what) { }
+	};
+
 	void split(const std::string& source, const std::string& destination);
 };
 

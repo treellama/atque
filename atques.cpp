@@ -27,8 +27,17 @@ int main(int argc, char *argv[])
 	if (argc != 3)
 	{
 		std::cerr << "Usage: atques <source> <dest_folder>" << std::endl;
-		exit(1);
+		return 1;
 	}
 
-	atque::split(argv[1], argv[2]);
+	try {
+		atque::split(argv[1], argv[2]);
+	}
+	catch (const atque::split_error& e)
+	{
+		std::cerr << "atques: " << e.what() << std::endl;
+		return 1;
+	}
+
+	return 0;
 }
