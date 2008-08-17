@@ -1,0 +1,11 @@
+AUTOMAKE_OPTIONS=foreign
+
+ACLOCAL_AMFLAGS = -I m4
+AM_CXXFLAGS=$(BOOST_CPPFLAGS)
+AM_LDFLAGS=$(BOOST_LDFLAGS)
+
+bin_PROGRAMS=atques
+
+atques_SOURCES=atques.cpp split.cpp split.h
+atques_LDADD=$(BOOST_FILESYSTEM_LIB)
+
