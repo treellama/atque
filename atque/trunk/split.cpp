@@ -138,18 +138,32 @@ void SaveTerminal(marathon::Wad& wad, const std::string& path)
 
 void atque::split(const std::string& src, const std::string& dest)
 {
-	if (!fs::exists(dest))
+	if (!fs::exists(src))
 	{
-		fs::create_directory(dest);
+		throw split_error(src + " does not exist");
 	}
-	else if (!fs::is_directory(dest))
+	
+	if (fs::exists(dest) && !fs::is_directory(dest))
 	{
-		std::cerr << "Destination must be a directory" << std::endl;
-		return;
+		throw split_error("destination must be a directory");
 	}
 
 	marathon::Unimap wadfile;
-	wadfile.Open(src.c_str());
+	if (!wadfile.Open(src.c_str()) or wadfile.data_version() < 1)
+	{
+		throw split_error("input must be a Marathon 2 or Infinity scenario");
+	}
+
+	if (!fs::exists(dest))
+	{
+		try {
+			fs::create_directory(dest);
+		}
+		catch (const std::runtime_error&)
+		{
+			throw split_error("could not create directory");
+		}
+	}
 
 	std::vector<int16> indexes = wadfile.GetWadIndexes();
 	for (std::vector<int16>::iterator it = indexes.begin(); it != indexes.end(); ++it)
@@ -157,27 +171,35 @@ void atque::split(const std::string& src, const std::string& dest)
 		marathon::Wad wad = wadfile.GetWad(*it);
 		if (wad.HasChunk(marathon::MapInfo::kTag))
 		{
-			marathon::MapInfo minf(wad.GetChunk(marathon::MapInfo::kTag));
-
-			std::string level = wadfile.GetLevelName(*it);
-			std::string actual_level = minf.level_name();
-			std::ostringstream level_number;
-			level_number << std::setw(2) << std::setfill('0') << *it;
-
-			fs::path destfolder = fs::path(dest) / (level_number.str() + " " + mac_roman_to_utf8(level));
-			fs::create_directory(destfolder);
-			
-			fs::path physics_path = destfolder / (mac_roman_to_utf8(actual_level) + ".phyA");
-			SavePhysics(wad, actual_level, physics_path.string());
-			
-			fs::path shapes_path = destfolder / (mac_roman_to_utf8(actual_level) + ".ShPa");
-			SaveShapes(wad, shapes_path.string());
-			
-			fs::path terminal_path = destfolder / (mac_roman_to_utf8(actual_level) + ".term.txt");
-			SaveTerminal(wad, terminal_path.string());
-			
-			fs::path level_path = destfolder / (mac_roman_to_utf8(actual_level) + ".sceA");
-			SaveLevel(wad, actual_level, level_path.string());
+			try {
+				marathon::MapInfo minf(wad.GetChunk(marathon::MapInfo::kTag));
+				
+				std::string level = wadfile.GetLevelName(*it);
+				std::string actual_level = minf.level_name();
+				std::ostringstream level_number;
+				level_number << std::setw(2) << std::setfill('0') << *it;
+				
+				fs::path destfolder = fs::path(dest) / (level_number.str() + " " + mac_roman_to_utf8(level));
+				fs::create_directory(destfolder);
+				
+				fs::path physics_path = destfolder / (mac_roman_to_utf8(actual_level) + ".phyA");
+				SavePhysics(wad, actual_level, physics_path.string());
+				
+				fs::path shapes_path = destfolder / (mac_roman_to_utf8(actual_level) + ".ShPa");
+				SaveShapes(wad, shapes_path.string());
+				
+				fs::path terminal_path = destfolder / (mac_roman_to_utf8(actual_level) + ".term.txt");
+				SaveTerminal(wad, terminal_path.string());
+				
+				fs::path level_path = destfolder / (mac_roman_to_utf8(actual_level) + ".sceA");
+				SaveLevel(wad, actual_level, level_path.string());
+			}
+			catch (const std::exception&)
+			{
+				std::ostringstream error;
+				error << "error writing level " << *it << "; aborting";
+				throw split_error(error.str());
+			}
 
 		}
 	}
