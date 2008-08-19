@@ -81,6 +81,13 @@ void MergeShapes(const fs::path& path, marathon::Wad& wad)
 	wad.AddChunk(shapes_tag, shapes_buffer);
 }
 
+void MergeTerminal(const fs::path& path, marathon::Wad& wad)
+{
+	marathon::TerminalChunk chunk;
+	chunk.Compile(path.string());
+	wad.AddChunk(marathon::TerminalChunk::kTag, chunk.Save());
+}
+
 marathon::Wad CreateWad(const std::string& level_name, const fs::path& path)
 {
 	marathon::Wad wad;
@@ -107,6 +114,10 @@ marathon::Wad CreateWad(const std::string& level_name, const fs::path& path)
 			if (extension_map.count(".ShPa"))
 			{
 				MergeShapes(extension_map[".ShPa"], wad);
+			}
+			if (extension_map.count(".txt"))
+			{
+				MergeTerminal(extension_map[".txt"], wad);
 			}
 		}
 	}
