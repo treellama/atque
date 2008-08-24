@@ -29,6 +29,8 @@
 #include "ferro/Unimap.h"
 
 #include "split.h"
+#include "CLUTResource.h"
+#include "PICTResource.h"
 
 #include <iostream>
 #include <iomanip>
@@ -97,21 +99,6 @@ void SaveShapes(marathon::Wad& wad, const std::string& path)
 			outfile.write(reinterpret_cast<const char*>(&data[0]), data.size());
 		}
 		wad.RemoveChunk(shapes_tag);
-	}
-}
-
-void SavePICT(marathon::Unimap& wad, marathon::Unimap::ResourceIdentifier id, const std::string& path)
-{
-	const std::vector<uint8>& data = wad.GetResource(id);
-	if (data.size())
-	{
-		std::ofstream outfile(path.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
-		for (int i = 0; i < 512; ++i)
-		{
-			outfile.put('\0');
-		}
-
-		outfile.write(reinterpret_cast<const char*>(&data[0]), data.size());
 	}
 }
 
@@ -204,29 +191,52 @@ void atque::split(const std::string& src, const std::string& dest)
 		}
 	}
 
-#if 0 // no resources for now
 	fs::path resource_path = fs::path(dest) / "Resources";
 	fs::create_directory(resource_path);
 
 	std::vector<marathon::Unimap::ResourceIdentifier> resources = wadfile.GetResourceIdentifiers();
 	for (std::vector<marathon::Unimap::ResourceIdentifier>::const_iterator it = resources.begin(); it != resources.end(); ++it)
 	{
-		if (it->first == FOUR_CHARS_TO_INT('P','I','C','T'))
+		if (it->first == FOUR_CHARS_TO_INT('P','I','C','T') || it->first == FOUR_CHARS_TO_INT('p','i','c','t'))
 		{
+			fs::path pict_dir = resource_path / "PICT";
+			fs::create_directory(pict_dir);
 			std::ostringstream resource_id;
 			resource_id << it->second;
 			
-			fs::path pict_path = resource_path / (resource_id.str() + ".pct"); 
-			SavePICT(wadfile, *it, pict_path.string());
+			fs::path pict_path = pict_dir / (resource_id.str() + ".pct"); 
+			PICTResource pict;
+			if (it->first == FOUR_CHARS_TO_INT('P','I','C','T'))
+			{
+				pict.Load(wadfile.GetResource(*it));
+			}
+			else
+			{
+				pict.LoadRaw(wadfile.GetResource(*it), wadfile.GetResource(marathon::Unimap::ResourceIdentifier(FOUR_CHARS_TO_INT('c','l','u','t'), it->second)));
+			}
+
+			pict.Export(pict_path.string());
 		}
 		else if (it->first == FOUR_CHARS_TO_INT('T','E','X','T'))
 		{
+			fs::path text_dir = resource_path / "TEXT";
+			fs::create_directory(text_dir);
 			std::ostringstream resource_id;
 			resource_id << it->second;
 
-			fs::path text_path = resource_path / (resource_id.str() + ".txt");
+			fs::path text_path = text_dir / (resource_id.str() + ".txt");
 			SaveTEXT(wadfile, *it, text_path.string());
 		}
+		else if (it->first == FOUR_CHARS_TO_INT('c','l','u','t'))
+		{
+			fs::path clut_dir = resource_path / "CLUT";
+			fs::create_directory(clut_dir);
+			std::ostringstream resource_id;
+			resource_id << it->second;
+			
+			fs::path clut_path = clut_dir / (resource_id.str() + ".act");
+			CLUTResource clut(wadfile.GetResource(*it));
+			clut.Export(clut_path.string());
+		}
 	}
-#endif
 }
