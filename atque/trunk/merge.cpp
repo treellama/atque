@@ -125,6 +125,55 @@ marathon::Wad CreateWad(const std::string& level_name, const fs::path& path)
 	return wad;
 }
 
+static std::vector<uint8> ReadFile(const std::string& path)
+{
+	std::ifstream infile;
+	infile.open(path.c_str(), std::ios::binary);
+	
+	infile.seekg(0, std::ios::end);
+	int length = infile.tellg();
+	infile.seekg(0, std::ios::beg);
+
+	std::vector<uint8> data(length);
+	infile.read(reinterpret_cast<char *>(&data[0]), data.size());
+
+	return data;
+}
+
+void MergeTEXTs(marathon::Unimap& wadfile, const fs::path& path)
+{
+	fs::directory_iterator end;
+	for (fs::directory_iterator dir(path); dir != end; ++dir)
+	{
+		if (!fs::is_directory(dir->status()))
+		{
+			std::istringstream s(dir->leaf());
+			int16 index;
+			s >> index;
+			if (!s.fail() && index >= 128)
+			{
+				wadfile.SetResource(FOUR_CHARS_TO_INT('t','e','x','t'), index, ReadFile(dir->string()));
+			}
+		}
+	}
+	
+}
+
+void MergeResources(marathon::Unimap& wadfile, const fs::path& path)
+{
+	fs::directory_iterator end;
+	for (fs::directory_iterator dir(path); dir != end; ++dir)
+	{
+		if (fs::is_directory(dir->status()))
+		{
+			if (dir->leaf() == "TEXT")
+			{
+				MergeTEXTs(wadfile, *dir);
+			}
+		}
+	}
+}
+
 void atque::merge(const std::string& src, const std::string& dest, std::vector<std::string>& log)
 {
 	if (!fs::exists(src))
@@ -143,23 +192,30 @@ void atque::merge(const std::string& src, const std::string& dest, std::vector<s
 	{
 		if (fs::is_directory(dir->status()))
 		{
-			std::istringstream s(dir->leaf());
-			int16 index;
-			s >> index;
-			if (!s.fail())
+			if (dir->leaf() == "Resources")
 			{
-				char c;
-				do {
-					c = s.get();
-				}
-				while (!s.fail() && c == ' ');
-
+				MergeResources(wadfile, *dir);
+			}
+			else
+			{
+				std::istringstream s(dir->leaf());
+				int16 index;
+				s >> index;
 				if (!s.fail())
 				{
-					std::string level_name;
-					std::getline(s, level_name);
-					wadfile.SetWad(index, CreateWad(level_name, *dir));
-				} 
+					char c;
+					do {
+						c = s.get();
+					}
+					while (!s.fail() && c == ' ');
+					
+					if (!s.fail())
+					{
+						std::string level_name;
+						std::getline(s, level_name);
+						wadfile.SetWad(index, CreateWad(level_name, *dir));
+					} 
+				}
 			}
 		}
 	}
