@@ -4,7 +4,7 @@ ACLOCAL_AMFLAGS = -I m4
 AM_CXXFLAGS=$(BOOST_CPPFLAGS)
 AM_LDFLAGS=$(BOOST_LDFLAGS)
 
-RESOURCE_SRCS=CLUTResource.h CLUTResource.cpp PICTResource.h PICTResource.cpp
+RESOURCE_SRCS=CLUTResource.h CLUTResource.cpp PICTResource.h PICTResource.cpp SndResource.h SndResource.cpp
 
 bin_PROGRAMS=atques atquem
 

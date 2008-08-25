@@ -20,6 +20,9 @@ dnl Check for ferro!
 AC_CHECK_HEADERS(ferro/Wadfile.h, , AC_ERROR([You must first install ferro]))
 AC_CHECK_LIB(ferro, main, LIBS="-lferro $LIBS", AC_ERROR([You must first install ferro]))
 
+AC_CHECK_HEADERS([sndfile.h], , AC_ERROR([Atque requires libsndfile]))
+AC_CHECK_LIB(sndfile, sf_open, LIBS="-lsndfile $LIBS", AC_ERROR([Atque requires libsndfile]))
+
 AX_BOOST_BASE([1.33.1])
 AX_BOOST_FILESYSTEM
 
