@@ -31,6 +31,7 @@
 #include "split.h"
 #include "CLUTResource.h"
 #include "PICTResource.h"
+#include "SndResource.h"
 
 #include <iostream>
 #include <iomanip>
@@ -237,6 +238,17 @@ void atque::split(const std::string& src, const std::string& dest)
 			fs::path clut_path = clut_dir / (resource_id.str() + ".act");
 			CLUTResource clut(wadfile.GetResource(*it));
 			clut.Export(clut_path.string());
+		}
+		else if (it->first == FOUR_CHARS_TO_INT('s','n','d',' '))
+		{
+			fs::path snd_dir = resource_path / "snd";
+			fs::create_directory(snd_dir);
+			std::ostringstream resource_id;
+			resource_id << it->second;
+			
+			fs::path snd_path = snd_dir / (resource_id.str() + ".wav");
+			SndResource snd(wadfile.GetResource(*it));
+			snd.Export(snd_path.string());
 		}
 	}
 }
