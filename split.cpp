@@ -218,7 +218,7 @@ void atque::split(const std::string& src, const std::string& dest)
 
 			pict.Export(pict_path.string());
 		}
-		else if (it->first == FOUR_CHARS_TO_INT('T','E','X','T'))
+		else if (it->first == FOUR_CHARS_TO_INT('T','E','X','T') || it->first == FOUR_CHARS_TO_INT('t','e','x','t'))
 		{
 			fs::path text_dir = resource_path / "TEXT";
 			fs::create_directory(text_dir);
