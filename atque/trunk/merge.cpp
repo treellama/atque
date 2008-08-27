@@ -30,6 +30,7 @@
 #include "ferro/Unimap.h"
 
 #include "CLUTResource.h"
+#include "PICTResource.h"
 
 #include <iostream>
 #include <map>
@@ -149,6 +150,28 @@ void MergeCLUTs(marathon::Unimap& wadfile, const fs::path& path)
 	}
 }
 
+void MergePICTs(marathon::Unimap& wadfile, const fs::path& path)
+{
+	fs::directory_iterator end;
+	for (fs::directory_iterator dir(path); dir != end; ++dir)
+	{
+		if (!fs::is_directory(dir->status()))
+		{
+			std::istringstream s(dir->leaf());
+			int16 index;
+			s >> index;
+			if (!s.fail() && index >= 128)
+			{
+				PICTResource pict;
+				if (pict.Import(dir->string()))
+				{
+					wadfile.SetResource(FOUR_CHARS_TO_INT('P','I','C','T'), index, pict.Save());
+				}
+			}
+		}
+	}
+}
+
 static std::vector<uint8> ReadFile(const std::string& path)
 {
 	std::ifstream infile;
@@ -197,6 +220,10 @@ void MergeResources(marathon::Unimap& wadfile, const fs::path& path)
 			else if (dir->leaf() == "CLUT")
 			{
 				MergeCLUTs(wadfile, *dir);
+			}
+			else if (dir->leaf() == "PICT")
+			{
+				MergePICTs(wadfile, *dir);
 			}
 		}
 	}
