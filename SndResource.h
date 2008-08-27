@@ -36,8 +36,10 @@ namespace atque
 		SndResource() { }
 		SndResource(const std::vector<uint8>& data) { Load(data); }
 		bool Load(const std::vector<uint8>&);
+		std::vector<uint8> Save() const;
 
 		void Export(const std::string& path) const;
+		bool Import(const std::string& path);
 
 	private:
 		bool UnpackStandardSystem7Header(AIStreamBE&);

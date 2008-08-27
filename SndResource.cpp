@@ -73,6 +73,61 @@ bool SndResource::Load(const std::vector<uint8>& data)
 	return false;
 }
 
+std::vector<uint8> SndResource::Save() const
+{
+	uint32 length = 10 + 10 + data_.size() + 64;
+	std::vector<uint8> result(length);
+	AOStreamBE stream(&result[0], result.size());
+
+	// resource header
+	int16 format = 1;
+	int16 data_formats = 1;
+	int16 data_type = 5;
+	uint32 initialization_options = (stereo_ ? 0x00c0 : 0x0080);
+	
+	stream << format
+	       << data_formats
+	       << data_type
+	       << initialization_options;
+
+	// command
+	int16 num_commands = 1;
+	int16 command = 0x8051;
+	uint16 param1 = 0;
+	uint32 param2 = 20;
+
+	stream << num_commands
+	       << command
+	       << param1
+	       << param2;
+
+	// extended sound header
+	uint32 ptr = 0;
+	int32 num_channels = (stereo_ ? 2 : 1);
+	uint32 loop_start = 0;
+	uint32 loop_end = 0;
+	uint8 header_type = 0xff;
+	uint8 baseFrequency = 0;
+	int32 num_frames = data_.size() / bytes_per_frame_;
+	int16 sample_size = (sixteen_bit_ ? 16 : 8);
+
+	stream << ptr
+	       << num_channels
+	       << rate_
+	       << loop_start
+	       << loop_end
+	       << header_type
+	       << baseFrequency
+	       << num_frames;
+	stream.ignore(22);
+	stream << sample_size;
+
+	stream.write(&data_[0], data_.size());
+
+	return result;
+
+}
+
 // all this just to read a file from memory!?
 struct sf_adapter
 {
@@ -148,6 +203,65 @@ private:
 	}
 
 };
+
+bool SndResource::Import(const std::string& path)
+{
+	SF_INFO inputInfo;
+	SNDFILE *infile = sf_open(path.c_str(), SFM_READ, &inputInfo);
+	if (!infile) return false;
+
+	sixteen_bit_ = !(inputInfo.format & (SF_FORMAT_PCM_S8 | SF_FORMAT_PCM_U8));
+	rate_ = static_cast<uint32>(inputInfo.samplerate) << 16;
+	stereo_ = (inputInfo.channels == 2);
+	signed_8bit_ = false;
+	bytes_per_frame_ = (sixteen_bit_ ? 2 : 1) * (stereo_ ? 2 : 1);
+	
+	SF_INFO outputInfo;
+	outputInfo.samplerate = inputInfo.samplerate;
+	outputInfo.channels = stereo_ ? 2 : 1;
+	if (sixteen_bit_)
+	{
+		outputInfo.format = SF_FORMAT_PCM_16 | SF_FORMAT_RAW | SF_ENDIAN_BIG;
+	}
+	else
+	{
+		outputInfo.format = SF_FORMAT_PCM_U8 | SF_FORMAT_RAW | SF_ENDIAN_BIG;
+	}
+
+	SF_VIRTUAL_IO virtual_io = {
+		&sf_adapter::get_filelen,
+		&sf_adapter::seek,
+		&sf_adapter::read,
+		&sf_adapter::write,
+		&sf_adapter::tell };
+
+	data_.resize(inputInfo.frames * bytes_per_frame_);
+	sf_adapter adapter(data_);
+
+	SNDFILE *outfile = sf_open_virtual(&virtual_io, SFM_WRITE, &outputInfo, &adapter);
+	if (!outfile) 
+		return false;
+
+	for (int i = 0; i < inputInfo.frames; ++i)
+	{
+		int frame[2];
+		if (sf_readf_int(infile, frame, 1) != 1)
+		{
+			std::cerr << "Read error" << std::endl;
+			return false;
+		}
+		if (sf_writef_int(outfile, frame, 1) != 1)
+		{
+			std::cerr << "Write error" << std::endl;
+			return false;
+		}
+	}
+
+	sf_close(infile);
+	sf_close(outfile);
+
+	return true;
+}
 
 void SndResource::Export(const std::string& path) const
 {
@@ -271,6 +385,9 @@ bool SndResource::UnpackExtendedSystem7Header(AIStreamBE& stream)
 
 	int16 sample_size;
 	stream >> sample_size;
+
+	if (header_type != 0xfe)
+		stream.ignore(14);
 
 	sixteen_bit_ = (sample_size == 16);
 	bytes_per_frame_ = (sixteen_bit_ ? 2 : 1) * (stereo_ ? 2 : 1);
