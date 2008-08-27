@@ -29,6 +29,8 @@
 #include "ferro/TerminalChunk.h"
 #include "ferro/Unimap.h"
 
+#include "CLUTResource.h"
+
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -125,6 +127,28 @@ marathon::Wad CreateWad(const std::string& level_name, const fs::path& path)
 	return wad;
 }
 
+void MergeCLUTs(marathon::Unimap& wadfile, const fs::path& path)
+{
+	fs::directory_iterator end;
+	for (fs::directory_iterator dir(path); dir != end; ++dir)
+	{
+		if (!fs::is_directory(dir->status()))
+		{
+			std::istringstream s(dir->leaf());
+			int16 index;
+			s >> index;
+			if (!s.fail() && index >= 128)
+			{
+				CLUTResource clut;
+				if (clut.Import(dir->string()))
+				{
+					wadfile.SetResource(FOUR_CHARS_TO_INT('c','l','u','t'), index, clut.Save());
+				}
+			}
+		}
+	}
+}
+
 static std::vector<uint8> ReadFile(const std::string& path)
 {
 	std::ifstream infile;
@@ -169,6 +193,10 @@ void MergeResources(marathon::Unimap& wadfile, const fs::path& path)
 			if (dir->leaf() == "TEXT")
 			{
 				MergeTEXTs(wadfile, *dir);
+			}
+			else if (dir->leaf() == "CLUT")
+			{
+				MergeCLUTs(wadfile, *dir);
 			}
 		}
 	}

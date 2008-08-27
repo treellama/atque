@@ -34,7 +34,9 @@ namespace atque
 		CLUTResource() { }
 		CLUTResource(const std::vector<uint8>& data) { Load(data); }
 		void Load(const std::vector<uint8>&);
+		std::vector<uint8> Save() const;
 
+		bool Import(const std::string& path);
 		void Export(const std::string& path) const;
 
 	private:
