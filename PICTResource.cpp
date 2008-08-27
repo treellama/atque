@@ -23,6 +23,8 @@
 
 #include <fstream>
 
+#include <string.h>
+
 using namespace atque;
 
 void PICTResource::Load(const std::vector<uint8>& data)
@@ -343,6 +345,21 @@ std::vector<uint8> PICTResource::Save() const
 
 	stream.write(&data_[0], data_.size());
 	return result;
+}
+
+bool PICTResource::Import(const std::string& path)
+{
+	std::ifstream infile(path.c_str(), std::ios::binary);
+	infile.seekg(0, std::ios::end);
+	std::streamsize length = infile.tellg();
+
+	if (length < 528) return false;
+	infile.seekg(512);
+	
+	std::vector<uint8> pict_data(length - 512);
+	infile.read(reinterpret_cast<char*>(&pict_data[0]), pict_data.size());
+	Load(pict_data);
+	return true;
 }
 
 void PICTResource::Export(const std::string& path) const

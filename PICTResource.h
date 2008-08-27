@@ -39,6 +39,7 @@ namespace atque
 		bool LoadRaw(const std::vector<uint8>& raw_data, const std::vector<uint8>& clut);
 		std::vector<uint8> Save() const;
 
+		bool Import(const std::string& path);
 		void Export(const std::string& path) const;
 
 	private:
