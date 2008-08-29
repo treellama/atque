@@ -205,7 +205,7 @@ void atque::split(const std::string& src, const std::string& dest)
 			std::ostringstream resource_id;
 			resource_id << it->second;
 			
-			fs::path pict_path = pict_dir / (resource_id.str() + ".pct"); 
+			fs::path pict_path = pict_dir / resource_id.str(); 
 			PICTResource pict;
 			if (it->first == FOUR_CHARS_TO_INT('P','I','C','T'))
 			{

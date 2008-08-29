@@ -22,6 +22,7 @@
 #define PICT_RESOURCE_H
 
 #include "ferro/cstypes.h"
+#include "EasyBMP.h"
 
 #include <vector>
 
@@ -40,9 +41,12 @@ namespace atque
 		std::vector<uint8> Save() const;
 
 		bool Import(const std::string& path);
-		void Export(const std::string& path) const;
+		void Export(const std::string& path);
 
 	private:
+		bool LoadCopyBits(AIStreamBE& stream, bool packed, bool clipped);
+		BMP bitmap_;
+
 		int16 top_;
 		int16 left_;
 		int16 bottom_;
