@@ -67,6 +67,16 @@ typedef struct RGBApixel {
 	ebmpBYTE Green;
 	ebmpBYTE Red;
 	ebmpBYTE Alpha;
+	bool operator<(const RGBApixel& rhs) const {
+		if (Blue != rhs.Blue)
+		 return Blue < rhs.Blue;
+		else if (Green != rhs.Green)
+		 return Green < rhs.Green;
+		else if (Red != rhs.Red)
+		 return Red < rhs.Red;
+		else
+		 return Alpha < rhs.Alpha;
+	}	
 } RGBApixel; 
 
 class BMFH{

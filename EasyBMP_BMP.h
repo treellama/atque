@@ -21,6 +21,8 @@
 #ifndef _EasyBMP_BMP_h_
 #define _EasyBMP_BMP_h_
 
+#include <map>
+
 bool SafeFread( char* buffer, int size, int number, FILE* fp );
 bool EasyBMPcheckDataSize( void );
 
@@ -51,8 +53,9 @@ class BMP
  bool Write8bitRow(  ebmpBYTE* Buffer, int BufferSize, int Row );  
  bool Write4bitRow(  ebmpBYTE* Buffer, int BufferSize, int Row );  
  bool Write1bitRow(  ebmpBYTE* Buffer, int BufferSize, int Row );
- 
+
  ebmpBYTE FindClosestColor( RGBApixel& input );
+ std::map<RGBApixel, ebmpBYTE> ClosestColorMap;
 
  public: 
 

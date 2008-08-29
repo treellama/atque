@@ -553,6 +553,7 @@ bool BMP::WriteToFile( const char* FileName )
  int i,j;
  if( BitDepth != 16 )
  {  
+  ClosestColorMap.clear();
   ebmpBYTE* Buffer;
   int BufferSize = (int) ( (Width*BitDepth)/8.0 );
   while( 8*BufferSize < Width*BitDepth )
@@ -597,8 +598,9 @@ bool BMP::WriteToFile( const char* FileName )
   }
   
   delete [] Buffer;
+  ClosestColorMap.clear();
  }
- 
+
  if( BitDepth == 16 )
  {
   // write the bit masks
@@ -1720,6 +1722,10 @@ bool BMP::Write1bitRow(  ebmpBYTE* Buffer, int BufferSize, int Row )
 ebmpBYTE BMP::FindClosestColor( RGBApixel& input )
 {
  using namespace std;
+
+ map<RGBApixel, ebmpBYTE>::iterator it = ClosestColorMap.find(input);
+ if (it != ClosestColorMap.end())
+  return it->second;
  
  int i=0;
  int NumberOfColors = TellNumberOfColors();
@@ -1738,6 +1744,7 @@ ebmpBYTE BMP::FindClosestColor( RGBApixel& input )
   { i = NumberOfColors; }
   i++;
  }
+ ClosestColorMap[input] = BestI;
  return BestI;
 }
 
