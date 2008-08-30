@@ -27,6 +27,7 @@
 #include <vector>
 
 class AIStreamBE;
+class AOStreamBE;
 
 namespace atque
 {
@@ -43,15 +44,79 @@ namespace atque
 		bool Import(const std::string& path);
 		void Export(const std::string& path);
 
+		struct Rect
+		{
+			int16 top;
+			int16 left;
+			int16 bottom;
+			int16 right;
+
+			void Load(AIStreamBE&);
+			void Save(AOStreamBE&) const;
+
+			int16 height() const { return bottom - top; }
+			int16 width() const { return right - left; }
+
+			Rect() { }
+			Rect(int width, int height) : top(0), left(0), bottom(height), right(width) { }
+		};
+
 	private:
 		bool LoadCopyBits(AIStreamBE& stream, bool packed, bool clipped);
 		bool LoadJPEG(AIStreamBE& stream);
+		std::vector<uint8> SaveJPEG() const;
+		std::vector<uint8> SaveBMP() const;
 		BMP bitmap_;
 
-		int16 top_;
-		int16 left_;
-		int16 bottom_;
-		int16 right_;
+		struct HeaderOp
+		{
+			enum {
+				kTag = 0x0c00,
+				kVersion = 0xfffe,
+				kSize = 26
+			};
+
+			int16 headerOp;
+			int16 headerVersion;
+			int16 reserved1;
+			int32 hRes;
+			int32 vRes;
+			Rect srcRect;
+			int32 reserved2;
+
+			HeaderOp() : headerOp(kTag), headerVersion(kVersion), reserved1(0), hRes(72 << 16), vRes(72 << 16), reserved2(0) { }
+			void Load(AIStreamBE&);
+			void Save(AOStreamBE&) const;
+		};
+
+		struct PixMap
+		{
+			enum {
+				kSize = 46,
+				kRGBDirect = 0x10
+			};
+
+			int16 rowBytes;
+			Rect bounds;
+			int16 pmVersion;
+			int16 packType;
+			uint32 packSize;
+			uint32 hRes;
+			uint32 vRes;
+			int16 pixelType;
+			int16 pixelSize;
+			int16 cmpCount;
+			int16 cmpSize;
+			uint32 planeBytes;
+			uint32 pmTable;
+			uint32 pmReserved;
+
+			PixMap() { };
+			PixMap(int depth, int rowBytes);
+
+			void Load(AIStreamBE&);
+			void Save(AOStreamBE&) const;
+		};
 
 		std::vector<uint8> data_;
 		std::vector<uint8> jpeg_;
