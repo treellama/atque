@@ -21,6 +21,7 @@
 #include "ferro/AStream.h"
 #include "PICTResource.h"
 
+#include <bitset>
 #include <fstream>
 
 #include <string.h>
@@ -160,16 +161,25 @@ void PICTResource::Load(const std::vector<uint8>& data)
 				bitmap_.SetSize(1, 1);
 				done = true;
 			}
+			else
+			{
+				if (bitmap_.TellHeight() > (bottom - top) || bitmap_.TellWidth() > (right - left))
+				{
+					std::cerr << "Damnit, Cinemascope" << std::endl;
+					bitmap_.SetSize(1, 1);
+					done = true;
+				}
+			}
 			break;
 		}
 
 		case 0x8200: {	// Compressed QuickTime image (we only handle JPEG compression)
-			uint32 size;
-			stream >> size;
-			if (size & 1)
-				size++;
-
-			stream.ignore(size);
+			if (!LoadJPEG(stream))
+			{
+				bitmap_.SetSize(1, 1);
+				jpeg_.clear();
+				done = true;
+			}
 			break;
 		}
 		
@@ -241,6 +251,36 @@ static std::vector<T> UnpackRow(AIStreamBE& stream, int row_bytes)
 	return result;
 }
 
+static std::vector<uint8> ExpandPixels(const std::vector<uint8>& scan_line, int depth)
+{
+	std::vector<uint8> result;
+	for (std::vector<uint8>::const_iterator it = scan_line.begin(); it != scan_line.end(); ++it)
+	{
+		if (depth == 4)
+		{
+			result.push_back((*it) >> 4);
+			result.push_back((*it) & 0xf);
+		}
+		else if (depth == 2)
+		{
+			result.push_back((*it) >> 6);
+			result.push_back(((*it) >> 4) & 0x3);
+			result.push_back(((*it) >> 2) & 0x3);
+			result.push_back((*it) & 0x3);
+		}
+		else if (depth == 1)
+		{
+			std::bitset<8> bits(*it);
+			for (int i = 0; i < 8; ++i)
+			{
+				result.push_back(bits[i] ? 1 : 0);
+			}
+		}
+	}
+
+	return result;
+}
+
 bool PICTResource::LoadCopyBits(AIStreamBE& stream, bool packed, bool clipped)
 {
 	if (!packed)
@@ -266,17 +306,18 @@ bool PICTResource::LoadCopyBits(AIStreamBE& stream, bool packed, bool clipped)
 		stream.ignore(14); // packSize/hRes/vRes/pixelType
 		stream >> pixel_size;
 		stream.ignore(16); // cmpCount/cmpSize/planeBytes/pmTable/pmReserved
-		if (pixel_size != 8 && pixel_size != 16 && pixel_size != 32) return false;
 	} 
 	else
 	{
-		return false;
 		pack_type = 0;
 		pixel_size = 1;
 	}
 
 	bitmap_.SetSize(width, height);
-	bitmap_.SetBitDepth(pixel_size);
+	if (pixel_size <= 8)
+		bitmap_.SetBitDepth(8);
+	else
+		bitmap_.SetBitDepth(pixel_size);
 	
 	// read the color table
 	if (is_pixmap && packed)
@@ -316,7 +357,7 @@ bool PICTResource::LoadCopyBits(AIStreamBE& stream, bool packed, bool clipped)
 	}
 
 	// the picture itself
-	if (pixel_size == 8)
+	if (pixel_size <= 8)
 	{
 		for (int y = 0; y < height; ++y)
 		{
@@ -331,9 +372,21 @@ bool PICTResource::LoadCopyBits(AIStreamBE& stream, bool packed, bool clipped)
 				scan_line = UnpackRow<uint8>(stream, row_bytes);
 			}
 
-			for (int x = 0; x < width; ++x)
+			if (pixel_size == 8)
 			{
-				bitmap_.SetPixel(x, y, bitmap_.GetColor(scan_line[x]));
+				for (int x = 0; x < width; ++x)
+				{
+					bitmap_.SetPixel(x, y, bitmap_.GetColor(scan_line[x]));
+				}
+			}
+			else
+			{
+				std::vector<uint8> pixels = ExpandPixels(scan_line, pixel_size);
+				
+				for (int x = 0; x < width; ++x)
+				{
+					bitmap_.SetPixel(x, y, bitmap_.GetColor(pixels[x]));
+				}
 			}
 		}		
 	}
@@ -411,6 +464,59 @@ bool PICTResource::LoadCopyBits(AIStreamBE& stream, bool packed, bool clipped)
 	return (pixel_size == 8 || pixel_size == 16 || pixel_size == 32);
 }
 
+bool PICTResource::LoadJPEG(AIStreamBE& stream)
+{
+	uint32 opcode_size;
+	stream >> opcode_size;
+	if (opcode_size & 1) 
+		opcode_size++;
+
+	uint32 opcode_start = stream.tellg();
+	
+	stream.ignore(26); // version/matrix (hom. part)
+	int16 offset_x, offset_y;
+	stream >> offset_x;
+	stream.ignore(2);
+	stream >> offset_y;
+	stream.ignore(2);
+	stream.ignore(4); // rest of matrix
+
+	uint32 matte_size;
+	stream >> matte_size;
+	stream.ignore(22); // matte rect/srcRect/accuracy
+
+	uint32 mask_size;
+	stream >> mask_size;
+
+	if (matte_size)
+	{
+		uint32 matte_id_size;
+		stream >> matte_id_size;
+		stream.ignore(matte_id_size - 4);
+	}
+
+	stream.ignore(matte_size);
+	stream.ignore(mask_size);
+
+	uint32 id_size, codec_type;
+	stream >> id_size
+	       >> codec_type;
+
+	if (codec_type != FOUR_CHARS_TO_INT('j','p','e','g'))
+		return false;
+
+	stream.ignore(36); // resvd1/resvd2/dataRefIndex/version/revisionLevel/vendor/temporalQuality/spatialQuality/width/height/hRes/vRes
+	uint32 data_size;
+	stream >> data_size;
+	stream.ignore(38); // frameCount/name/depth/clutID
+
+	jpeg_.resize(data_size);
+	stream.read(&jpeg_[0], jpeg_.size());
+	
+	stream.ignore(opcode_start + opcode_size - stream.tellg());
+	return true;
+}
+
 static std::vector<uint8> PackBits(std::vector<uint8>::const_iterator start, std::vector<uint8>::const_iterator end)
 {
 	std::vector<uint8> result;
@@ -468,7 +574,7 @@ static std::vector<uint8> PackBits(std::vector<uint8>::const_iterator start, std
 	return result;
 
 }
-
+/*
 bool PICTResource::LoadRaw(const std::vector<uint8>& data, const std::vector<uint8>& clut)
 {
 	data_.clear();
@@ -695,6 +801,79 @@ bool PICTResource::LoadRaw(const std::vector<uint8>& data, const std::vector<uin
 
 	return true;
 }
+*/
+
+bool PICTResource::LoadRaw(const std::vector<uint8>& data, const std::vector<uint8>& clut)
+{
+	AIStreamBE stream(&data[0], data.size());
+	int16 top, left, bottom, right, depth;
+
+	stream >> top
+	       >> left
+	       >> bottom
+	       >> right
+	       >> depth;
+	
+	int height = bottom - top;
+	int width = right - left;
+
+	if (depth != 8 && depth != 16)
+		return false;
+
+	bitmap_.SetBitDepth(depth);	
+	bitmap_.SetSize(width, height);
+
+	if (depth == 8)
+	{
+		if (clut.size() != 6 + 256 * 6)
+			return false;
+
+		AIStreamBE clut_stream(&clut[0], clut.size());
+		clut_stream.ignore(6);
+		for (int i = 0; i < 256; ++i)
+		{
+			uint16 red, green, blue;
+			clut_stream >> red 
+				    >> green
+				    >> blue;
+
+			RGBApixel color = { blue >> 8, green >> 8, red >> 8, 0xff };
+			bitmap_.SetColor(i, color);
+		}
+		for (int y = 0; y < height; ++y)
+		{
+			for (int x = 0; x < width; ++x)
+			{
+				uint8 pixel;
+				stream >> pixel;
+				bitmap_.SetPixel(x, y, bitmap_.GetColor(pixel));
+			}
+		}
+	}
+	else
+	{
+		for (int y = 0; y < height; ++y)
+		{
+			for (int x = 0; x < width; ++x)
+			{
+				uint16 color;
+				stream >> color;
+				RGBApixel pixel;
+				pixel.Red = (color >> 10) & 0x1f;
+				pixel.Green = (color >> 5) & 0x1f;
+				pixel.Blue = color & 0x1f;
+				pixel.Red = (pixel.Red * 255 + 16) / 31;
+				pixel.Green = (pixel.Green * 255 + 16) / 31;
+				pixel.Blue = (pixel.Blue * 255 + 16) / 31;
+				pixel.Alpha = 0xff;
+				
+				bitmap_.SetPixel(x, y, pixel);
+			}
+		}
+	}
+
+	return true;
+}
 
 std::vector<uint8> PICTResource::Save() const
 {
@@ -737,6 +916,12 @@ void PICTResource::Export(const std::string& path)
 	{
 		std::string bmp_path = path + ".bmp";
 		bitmap_.WriteToFile(bmp_path.c_str());
+	}
+	else if (jpeg_.size())
+	{
+		std::string jpeg_path = path + ".jpg";
+		std::ofstream outfile(jpeg_path.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+		outfile.write(reinterpret_cast<const char *>(&jpeg_[0]), jpeg_.size());
 	}
 	else
 	{
