@@ -766,93 +766,60 @@ std::vector<uint8> PICTResource::SaveBMP() const
 	int16 transfer_mode = 0;
 	ostream << transfer_mode;
 
+	std::map<RGBApixel, int> color_map; // for faster saving of 8-bit images
 	if (depth == 8)
 	{
-		std::map<RGBApixel, int> color_map;
 		for (int i = 255; i >= 0; --i)
 		{
 			color_map[const_cast<BMP&>(bitmap_).GetColor(i)] = i;
 		}
-		
-		for (int y = 0; y < height; ++y)
+	}
+
+	for (int y = 0; y < height; ++y)
+	{
+		std::vector<uint8> scan_line;
+		if (depth == 8)
 		{
-			// build a scan line
-			std::vector<uint8> scan_line(width);
+			std::vector<uint8> pixels(width);
 			for (int x = 0; x < width; ++x)
 			{
-				scan_line[x] = color_map[bitmap_.GetPixel(x, y)];
+				pixels[x] = color_map[bitmap_.GetPixel(x, y)];
 			}
 
-			std::vector<uint8> compressed_scan_line = PackRow(scan_line);
-
-			if (row_bytes > 250)
-			{
-				uint16 length = compressed_scan_line.size();
-				ostream << length;
-				ostream.write(&compressed_scan_line[0], compressed_scan_line.size());
-			}
-			else
-			{
-				uint8 length = compressed_scan_line.size();
-				ostream << length;
-				ostream.write(&compressed_scan_line[0], compressed_scan_line.size());
-			}
+			scan_line = PackRow(pixels);
 		}
-	}
-	else if (depth == 16)
-	{
-		for (int y = 0; y < height; ++y)
+		else if (depth == 16)
 		{
-			std::vector<uint16> scan_line(width);
+			std::vector<uint16> pixels(width);
 			for (int x = 0; x < width; ++x)
 			{
 				uint16 red = bitmap_.GetPixel(x, y).Red >> 3;
 				uint16 green = bitmap_.GetPixel(x, y).Green >> 3;
 				uint16 blue = bitmap_.GetPixel(x, y).Blue >> 3;
-				scan_line[x] = (red << 10) | (green << 5) | blue;
-			}
-			
-			std::vector<uint8> compressed_scan_line = PackRow(scan_line);
-			if (row_bytes > 250)
-			{
-				uint16 length = compressed_scan_line.size();
-				ostream << length;
-				ostream.write(&compressed_scan_line[0], compressed_scan_line.size());
-			}
-			else
-			{
-				uint8 length = compressed_scan_line.size();
-				ostream << length;
-				ostream.write(&compressed_scan_line[0], compressed_scan_line.size());
-			}
-		}
-	}
-	else if (depth == 32)
-	{
-		for (int y = 0; y < height; ++y)
-		{
-			std::vector<uint8> scan_line(width * 3);
-			for (int x = 0; x < width; ++x)
-			{
-				scan_line[x] = bitmap_.GetPixel(x, y).Red;
-				scan_line[x + width] = bitmap_.GetPixel(x, y).Green;
-				scan_line[x + width * 2] = bitmap_.GetPixel(x, y).Blue;
+				pixels[x] = (red << 10) | (green << 5) | blue;
 			}
 
-			std::vector<uint8> compressed_scan_line = PackRow(scan_line);
-			if (row_bytes > 250)
-			{
-				uint16 length = compressed_scan_line.size();
-				ostream << length;
-				ostream.write(&compressed_scan_line[0], compressed_scan_line.size());
-			}
-			else
-			{
-				uint8 length = compressed_scan_line.size();
-				ostream << length;
-				ostream.write(&compressed_scan_line[0], compressed_scan_line.size());
-			}
+			scan_line = PackRow(pixels);
 		}
+		else
+		{
+			std::vector<uint8> pixels(width * 3);
+			for (int x = 0; x < width; ++x)
+			{
+				pixels[x] = bitmap_.GetPixel(x, y).Red;
+				pixels[x + width] = bitmap_.GetPixel(x, y).Green;
+				pixels[x + width * 2] = bitmap_.GetPixel(x, y).Blue;
+			}
+
+			scan_line = PackRow(pixels);
+		}
+
+		if (row_bytes > 250)
+			ostream << static_cast<uint16>(scan_line.size());
+		else
+			ostream << static_cast<uint8>(scan_line.size());
+	
+		ostream.write(&scan_line[0], scan_line.size());
 	}
 
 	if (ostream.tellp() & 1)
