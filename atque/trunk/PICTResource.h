@@ -45,6 +45,7 @@ namespace atque
 
 	private:
 		bool LoadCopyBits(AIStreamBE& stream, bool packed, bool clipped);
+		bool LoadJPEG(AIStreamBE& stream);
 		BMP bitmap_;
 
 		int16 top_;
@@ -53,7 +54,7 @@ namespace atque
 		int16 right_;
 
 		std::vector<uint8> data_;
-		
+		std::vector<uint8> jpeg_;
 	};
 
 }
