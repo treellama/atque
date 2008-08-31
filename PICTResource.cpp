@@ -1004,11 +1004,8 @@ std::vector<uint8> PICTResource::SaveJPEG() const
 	ostream << id_size
 		<< codec_type;
 	ostream.ignore(8); // rsrvd1, rsrvd2, dataRefIndex
-	version = 1;
-	ostream << version;
-	ostream << version; // revisionLevel
-	uint32 vendor = FOUR_CHARS_TO_INT('@','q','u','e');
-	ostream << vendor;
+	ostream.ignore(4); // revision, revisionLevel
+	ostream.ignore(4); // vendor
 	ostream.ignore(4); // temporalQuality
 	uint32 res = 72 << 16;
 	ostream << accuracy // spatialQuality
@@ -1022,7 +1019,7 @@ std::vector<uint8> PICTResource::SaveJPEG() const
 	ostream << data_size
 		<< frame_count;
 	ostream.ignore(32); // name
-	int16 depth = 24;
+	int16 depth = 32;
 	int16 clut_id = -1;
 	ostream << depth
 		<< clut_id;
