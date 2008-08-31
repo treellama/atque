@@ -694,7 +694,7 @@ std::vector<uint8> PICTResource::SaveBMP() const
 	}
 	else
 	{
-		row_bytes = width * (depth == 16 ? 2 : 3);
+		row_bytes = width * (depth == 16 ? 2 : 4);
 		// opcode(2), pmBaseAddr(4), pixmap(46), srcRect/dstRect/mode(18)
 		output_length += 2 + 4 + PixMap::kSize + 18;
 	}
