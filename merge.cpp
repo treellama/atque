@@ -25,6 +25,7 @@
 
 #include "merge.h"
 #include "ferro/cstypes.h"
+#include "ferro/macroman.h"
 #include "ferro/Wad.h"
 #include "ferro/TerminalChunk.h"
 #include "ferro/Unimap.h"
@@ -92,7 +93,7 @@ void MergeTerminal(const fs::path& path, marathon::Wad& wad)
 	wad.AddChunk(marathon::TerminalChunk::kTag, chunk.Save());
 }
 
-marathon::Wad CreateWad(const std::string& level_name, const fs::path& path)
+marathon::Wad CreateWad(const fs::path& path)
 {
 	marathon::Wad wad;
 	std::map<std::string, fs::path> extension_map;
@@ -285,17 +286,15 @@ void atque::merge(const std::string& src, const std::string& dest, std::vector<s
 				s >> index;
 				if (!s.fail())
 				{
-					char c;
-					do {
-						c = s.get();
-					}
-					while (!s.fail() && c == ' ');
+					while (!s.fail() && s.peek() == ' ')
+						s.get();
 					
 					if (!s.fail())
 					{
 						std::string level_name;
 						std::getline(s, level_name);
-						wadfile.SetWad(index, CreateWad(level_name, *dir));
+						wadfile.SetWad(index, CreateWad(*dir));
+						wadfile.SetLevelName(index, utf8_to_mac_roman(level_name));
 					} 
 				}
 			}
