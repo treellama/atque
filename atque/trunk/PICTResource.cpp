@@ -54,6 +54,7 @@ void PICTResource::Load(const std::vector<uint8>& data)
 {
 	bitmap_.SetSize(1, 1);
 	data_.clear();
+	jpeg_.clear();
 	AIStreamBE stream(&data[0], data.size());
 
 	int16 size;
@@ -165,21 +166,28 @@ void PICTResource::Load(const std::vector<uint8>& data)
 				bitmap_.SetSize(1, 1);
 				done = true;
 			}
-			else
+			else if (jpeg_.size())
 			{
-				if (bitmap_.TellWidth() != rect.width() && bitmap_.TellWidth() == 614)
+				bitmap_.SetSize(1, 1);
+			}
+			else if (bitmap_.TellWidth() != rect.width() && bitmap_.TellWidth() == 614)
 					
-				{
-					std::cerr << "Damnit, Cinemascope" << std::endl;
-					bitmap_.SetSize(1, 1);
-					done = true;
-				}
+			{
+				std::cerr << "Damnit, Cinemascope" << std::endl;
+				bitmap_.SetSize(1, 1);
+				done = true;
 			}
 			break;
 		}
 
 		case 0x8200: {	// Compressed QuickTime image (we only handle JPEG compression)
-			if (!LoadJPEG(stream))
+			if (jpeg_.size())
+			{
+				std::cerr << "Banded JPEG PICT" << std::endl;
+				jpeg_.clear();
+				done = true;
+			}
+			else if (!LoadJPEG(stream))
 			{
 				bitmap_.SetSize(1, 1);
 				jpeg_.clear();
@@ -201,7 +209,7 @@ void PICTResource::Load(const std::vector<uint8>& data)
 		}
 	}
 
-	if (bitmap_.TellHeight() == 1 && bitmap_.TellWidth() == 1)
+	if (bitmap_.TellHeight() == 1 && bitmap_.TellWidth() == 1 && !jpeg_.size())
 	{
 		data_ = data;
 	}
@@ -463,7 +471,7 @@ bool PICTResource::LoadCopyBits(AIStreamBE& stream, bool packed, bool clipped)
 	if (stream.tellg() & 1)
 		stream.ignore(1);
 
-	return (pixel_size == 8 || pixel_size == 16 || pixel_size == 32);
+	return true;
 }
 
 bool PICTResource::LoadJPEG(AIStreamBE& stream)
@@ -484,7 +492,7 @@ bool PICTResource::LoadJPEG(AIStreamBE& stream)
 	stream.ignore(4); // rest of matrix
 	if (offset_x != 0 || offset_y != 0)
 	{
-		std::cerr << "We don't support banded PICTs" << std::endl;
+		std::cerr << "Banded JPEG PICT" << std::endl;
 		return false;
 	}
 
@@ -510,7 +518,10 @@ bool PICTResource::LoadJPEG(AIStreamBE& stream)
 	       >> codec_type;
 
 	if (codec_type != FOUR_CHARS_TO_INT('j','p','e','g'))
+	{
+		std::cerr << "QuickTime compression only supports JPEG" << std::endl;
 		return false;
+	}
 
 	stream.ignore(36); // resvd1/resvd2/dataRefIndex/version/revisionLevel/vendor/temporalQuality/spatialQuality/width/height/hRes/vRes
 	uint32 data_size;
@@ -688,8 +699,8 @@ std::vector<uint8> PICTResource::SaveBMP() const
 		output_length += 2 + 4 + PixMap::kSize + 18;
 	}
 
-	// data is variable, in the worst case pack bits could increase our size to 128 bytes for each 127 we compress
-	output_length += height * (row_bytes * 128 / 127 + 1);
+	// data is variable--allocate twice what we need
+	output_length += height * row_bytes * 2;
 	result.resize(output_length);
 	AOStreamBE ostream(&result[0], result.size());
 
@@ -832,10 +843,200 @@ std::vector<uint8> PICTResource::SaveBMP() const
 	return result;
 }
 
+static bool ParseJPEGDimensions(const std::vector<uint8>& data, int16& width, int16& height)
+{
+	try
+	{
+
+		AIStreamBE stream(&data[0], data.size());
+		uint16 magic;
+		stream >> magic;
+		if (magic != 0xffd8)
+			return false;
+		
+		while (stream.tellg() < stream.maxg())
+		{
+			// eat until we find 0xff
+			uint8 c;
+			do 
+			{
+				stream >> c;
+			} 
+			while (c != 0xff);
+
+			// eat 0xffs until we find marker code
+			do
+			{
+				stream >> c;
+			}
+			while (c == 0xff);
+
+			switch (c) 
+			{
+			case 0xd9: // end of image
+			case 0xda: // start of scan
+				return false;
+				break;
+			case 0xc0:
+			case 0xc1:
+			case 0xc2:
+			case 0xc3:
+			case 0xc5:
+			case 0xc6:
+			case 0xc7:
+			case 0xc8:
+			case 0xc9:
+			case 0xca:
+			case 0xcb:
+			case 0xcd:
+			case 0xce:
+			case 0xcf: {
+				// start of frame
+				uint16 length;
+				uint8 precision;
+				stream >> length
+				       >> precision
+				       >> height
+				       >> width;
+				
+				return true;
+				break;
+			}
+			default: 
+			{
+				uint16 length;
+				stream >> length;
+				if (length < 2)
+					return false;
+				else
+					stream.ignore(length - 2);
+				break;
+			}
+			}
+		}
+
+		return false;
+	}
+	catch (const AStream::failure&)
+	{
+		return false;
+	}
+}
+
 std::vector<uint8> PICTResource::SaveJPEG() const
 {
 	std::vector<uint8> result;
+
+	int16 width, height;
+	if (!ParseJPEGDimensions(jpeg_, width, height)) 
+		return result;
+
+	// size(2), rect(8), versionOp(2), version(2), headerOp(26), clip(12)
+	int output_length = 10 + 2 + 2 + HeaderOp::kSize + 12;
+
+	// PICT opcode
+	output_length += 76;
+	
+	// image description
+	output_length += 86;
+
+	output_length += jpeg_.size();
+
+	// end opcode
+	output_length += 2;
+
+	if (output_length & 1)
+		output_length++;
+
+	result.resize(output_length);
+	AOStreamBE ostream(&result[0], result.size());
+
+	int16 size = 0;
+	Rect clipRect(width, height);
+
+	ostream << size;
+	clipRect.Save(ostream);
+
+	int16 versionOp = 0x0011;
+	int16 version = 0x02ff;
+
+	ostream << versionOp
+		<< version;
+
+	HeaderOp headerOp;
+	headerOp.srcRect = clipRect;
+	headerOp.Save(ostream);
+
+	int16 clip = 0x0001;
+	int16 clipSize = 10;
+	ostream << clip
+		<< clipSize;
+	clipRect.Save(ostream);
+
+	uint16 opcode = 0x8200;
+	uint32 opcode_size = 154 + jpeg_.size();
+	ostream << opcode
+		<< opcode_size;
+
+	ostream.ignore(2); // version
+	std::vector<int16> matrix(18);
+	matrix[0] = 1;
+	matrix[8] = 1;
+	matrix[16] = 0x4000;
+
+	for (int i = 0; i < matrix.size(); ++i)
+	{
+		ostream << matrix[i];
+	}
+	
+	ostream.ignore(4); // matte size
+	ostream.ignore(8); // matte rect
+	
+	uint16 transfer_mode = 0x0040;
+	ostream << transfer_mode;
+	clipRect.Save(ostream);
+	uint32 accuracy = 768;
+	ostream << accuracy;
+	ostream.ignore(4); // mask size
+	
+	uint32 id_size = 86;
+	uint32 codec_type = FOUR_CHARS_TO_INT('j','p','e','g');
+	ostream << id_size
+		<< codec_type;
+	ostream.ignore(8); // rsrvd1, rsrvd2, dataRefIndex
+	version = 1;
+	ostream << version;
+	ostream << version; // revisionLevel
+	uint32 vendor = FOUR_CHARS_TO_INT('@','q','u','e');
+	ostream << vendor;
+	ostream.ignore(4); // temporalQuality
+	uint32 res = 72 << 16;
+	ostream << accuracy // spatialQuality
+		<< width
+		<< height
+		<< res // hRes
+		<< res; // vRes
+
+	uint32 data_size = jpeg_.size();
+	uint16 frame_count = 1;
+	ostream << data_size
+		<< frame_count;
+	ostream.ignore(32); // name
+	int16 depth = 24;
+	int16 clut_id = -1;
+	ostream << depth
+		<< clut_id;
+	
+	ostream.write(&jpeg_[0], jpeg_.size());
+
+	if (ostream.tellp() & 1)
+		ostream.ignore(1);
+
+	int16 endPic = 0x00ff;
+	ostream << endPic;
+	
 	return result;
+	
 }
 
 std::vector<uint8> PICTResource::Save() const
@@ -861,6 +1062,16 @@ bool PICTResource::Import(const std::string& path)
 	if (algo::ends_with(path, ".bmp"))
 	{
 		bitmap_.ReadFromFile(path.c_str());
+	}
+	else if (algo::ends_with(path, ".jpg"))
+	{
+		std::ifstream infile(path.c_str(), std::ios::binary);
+		infile.seekg(0, std::ios::end);
+		std::streamsize length = infile.tellg();
+		
+		infile.seekg(0);
+		jpeg_.resize(length);
+		infile.read(reinterpret_cast<char*>(&jpeg_[0]), jpeg_.size());
 	}
 	else
 	{
