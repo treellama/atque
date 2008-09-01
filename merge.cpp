@@ -88,9 +88,18 @@ void MergeShapes(const fs::path& path, marathon::Wad& wad)
 
 void MergeTerminal(const fs::path& path, marathon::Wad& wad)
 {
-	marathon::TerminalChunk chunk;
-	chunk.Compile(path.string());
-	wad.AddChunk(marathon::TerminalChunk::kTag, chunk.Save());
+	try 
+	{
+		marathon::TerminalChunk chunk;
+		chunk.Compile(path.string());
+		wad.AddChunk(marathon::TerminalChunk::kTag, chunk.Save());
+	}
+	catch (const marathon::TerminalChunk::ParseError& e)
+	{
+		std::ostringstream error;
+		error << path.string() << ": " << e.what();
+		std::cerr << error.str() << std::endl;
+	}
 }
 
 marathon::Wad CreateWad(const fs::path& path)
