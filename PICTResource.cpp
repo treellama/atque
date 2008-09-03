@@ -23,6 +23,7 @@
 
 #include <bitset>
 #include <fstream>
+#include <sstream>
 
 #include <boost/algorithm/string/predicate.hpp>
 
@@ -63,155 +64,156 @@ void PICTResource::Load(const std::vector<uint8>& data)
 	Rect rect;
 	rect.Load(stream);
 
-	bool done = false;
-	while (!done)
+	try 
 	{
-		uint16 opcode;
-		stream >> opcode;
-
-		switch (opcode) {
+		bool done = false;
+		while (!done)
+		{
+			uint16 opcode;
+			stream >> opcode;
 			
-		case 0x0000:	// NOP
-		case 0x0011:	// VersionOp
-		case 0x001c:	// HiliteMode
-		case 0x001e:	// DefHilite
-		case 0x0038:	// FrameSameRect
-		case 0x0039:	// PaintSameRect
-		case 0x003a:	// EraseSameRect
-		case 0x003b:	// InvertSameRect
-		case 0x003c:	// FillSameRect
-		case 0x02ff:	// Version
-			break;
-
-		case 0x00ff:	// OpEndPic
-			done = true;
-			break;
-
-		case 0x0001: {	// Clipping region
-			uint16 size;
-			stream >> size;
-			if (size & 1)
-				size++;
-			stream.ignore(size - 2);
-			break;
-		}
-
-		case 0x0003:	// TxFont
-		case 0x0004:	// TxFace
-		case 0x0005:	// TxMode
-		case 0x0008:	// PnMode
-		case 0x000d:	// TxSize
-		case 0x0015:	// PnLocHFrac
-		case 0x0016:	// ChExtra
-		case 0x0023:	// ShortLineFrom
-		case 0x00a0:	// ShortComment
-			stream.ignore(2);
-			break;
-
-		case 0x0006:	// SpExtra
-		case 0x0007:	// PnSize
-		case 0x000b:	// OvSize
-		case 0x000c:	// Origin
-		case 0x000e:	// FgColor
-		case 0x000f:	// BgColor
-		case 0x0021:	// LineFrom
-			stream.ignore(4);
-			break;
-
-		case 0x001a:	// RGBFgCol
-		case 0x001b:	// RGBBkCol
-		case 0x001d:	// HiliteColor
-		case 0x001f:	// OpColor
-		case 0x0022:	// ShortLine
-			stream.ignore(6);
-			break;
-
-		case 0x0002:	// BkPat
-		case 0x0009:	// PnPat
-		case 0x000a:	// FillPat
-		case 0x0010:	// TxRatio
-		case 0x0020:	// Line
-		case 0x0030:	// FrameRect
-		case 0x0031:	// PaintRect
-		case 0x0032:	// EraseRect
-		case 0x0033:	// InvertRect
-		case 0x0034:	// FillRect
-			stream.ignore(8);
-			break;
-
-		case 0x0c00: {	// HeaderOp
-			HeaderOp headerOp;
-			headerOp.Load(stream);
-			break;
-		}
-
-		case 0x00a1: {	// LongComment
-			stream.ignore(2);
-			int16 size;
-			stream >> size;
-			if (size & 1)
-				size++;
-			stream.ignore(size);
-			break;
-		}
-
-		case 0x0098:	// Packed CopyBits
-		case 0x0099:	// Packed CopyBits with clipping region
-		case 0x009a:	// Direct CopyBits
-		case 0x009b: {	// Direct CopyBits with clipping region
-			bool packed = (opcode == 0x0098 || opcode == 0x0099);
-			bool clipped = (opcode == 0x0099 || opcode == 0x009b);
-			if (!LoadCopyBits(stream, packed, clipped))
-			{
-				bitmap_.SetSize(1, 1);
-				done = true;
-			}
-			else if (jpeg_.size())
-			{
-				bitmap_.SetSize(1, 1);
-			}
-			else if (bitmap_.TellWidth() != rect.width() && bitmap_.TellWidth() == 614)
-					
-			{
-				std::cerr << "Damnit, Cinemascope" << std::endl;
-				bitmap_.SetSize(1, 1);
-				done = true;
-			}
-			break;
-		}
-
-		case 0x8200: {	// Compressed QuickTime image (we only handle JPEG compression)
-			if (jpeg_.size())
-			{
-				std::cerr << "Banded JPEG PICT" << std::endl;
-				jpeg_.clear();
-				done = true;
-			}
-			else if (!LoadJPEG(stream))
-			{
-				bitmap_.SetSize(1, 1);
-				jpeg_.clear();
-				done = true;
-			}
-			break;
-		}
-		
-		default:
-			if (opcode >= 0x0300 && opcode < 0x8000)
-				stream.ignore((opcode >> 8) * 2);
-			else if (opcode >= 0x8000 && opcode < 0x8100)
+			switch (opcode) {
+				
+			case 0x0000:	// NOP
+			case 0x0011:	// VersionOp
+			case 0x001c:	// HiliteMode
+			case 0x001e:	// DefHilite
+			case 0x0038:	// FrameSameRect
+			case 0x0039:	// PaintSameRect
+			case 0x003a:	// EraseSameRect
+			case 0x003b:	// InvertSameRect
+			case 0x003c:	// FillSameRect
+			case 0x02ff:	// Version
 				break;
-			else {
-				std::cerr << "Unimplemented opcode" << std::hex << opcode << std::dec << " at " << stream.tellg() << std::endl;
+
+			case 0x00ff:	// OpEndPic
 				done = true;
+				break;
+
+			case 0x0001: {	// Clipping region
+				uint16 size;
+				stream >> size;
+				if (size & 1)
+					size++;
+				stream.ignore(size - 2);
+				break;
 			}
-			break;
+
+			case 0x0003:	// TxFont
+			case 0x0004:	// TxFace
+			case 0x0005:	// TxMode
+			case 0x0008:	// PnMode
+			case 0x000d:	// TxSize
+			case 0x0015:	// PnLocHFrac
+			case 0x0016:	// ChExtra
+			case 0x0023:	// ShortLineFrom
+			case 0x00a0:	// ShortComment
+				stream.ignore(2);
+				break;
+
+			case 0x0006:	// SpExtra
+			case 0x0007:	// PnSize
+			case 0x000b:	// OvSize
+			case 0x000c:	// Origin
+			case 0x000e:	// FgColor
+			case 0x000f:	// BgColor
+			case 0x0021:	// LineFrom
+				stream.ignore(4);
+				break;
+
+			case 0x001a:	// RGBFgCol
+			case 0x001b:	// RGBBkCol
+			case 0x001d:	// HiliteColor
+			case 0x001f:	// OpColor
+			case 0x0022:	// ShortLine
+				stream.ignore(6);
+				break;
+
+			case 0x0002:	// BkPat
+			case 0x0009:	// PnPat
+			case 0x000a:	// FillPat
+			case 0x0010:	// TxRatio
+			case 0x0020:	// Line
+			case 0x0030:	// FrameRect
+			case 0x0031:	// PaintRect
+			case 0x0032:	// EraseRect
+			case 0x0033:	// InvertRect
+			case 0x0034:	// FillRect
+				stream.ignore(8);
+				break;
+
+			case 0x0c00: {	// HeaderOp
+				HeaderOp headerOp;
+				headerOp.Load(stream);
+				break;
+			}
+
+			case 0x00a1: {	// LongComment
+				stream.ignore(2);
+				int16 size;
+				stream >> size;
+				if (size & 1)
+					size++;
+				stream.ignore(size);
+				break;
+			}
+
+			case 0x0098:	// Packed CopyBits
+			case 0x0099:	// Packed CopyBits with clipping region
+			case 0x009a:	// Direct CopyBits
+			case 0x009b: {	// Direct CopyBits with clipping region
+				bool packed = (opcode == 0x0098 || opcode == 0x0099);
+				bool clipped = (opcode == 0x0099 || opcode == 0x009b);
+				LoadCopyBits(stream, packed, clipped);
+				if (jpeg_.size())
+				{
+					bitmap_.SetSize(1, 1);
+				}
+				else if (bitmap_.TellWidth() != rect.width() && bitmap_.TellWidth() == 614)
+					
+				{
+					throw ParseError("PICT appears to use Cinemascope hack");
+				}
+				break;
+			}
+
+			case 0x8200: {	// Compressed QuickTime image (we only handle JPEG compression)
+				if (jpeg_.size())
+				{
+					throw ParseError("PICT contains banded JPEG");
+				}
+				LoadJPEG(stream);
+				break;
+			}
+		
+			default:
+				if (opcode >= 0x0300 && opcode < 0x8000)
+					stream.ignore((opcode >> 8) * 2);
+				else if (opcode >= 0x8000 && opcode < 0x8100)
+					break;
+				else 
+				{
+					std::ostringstream s;
+					s << "Unimplemented opcode " << std::hex << opcode;
+					throw ParseError(s.str());
+				}
+				break;
+			}
 		}
 	}
-
-	if (bitmap_.TellHeight() == 1 && bitmap_.TellWidth() == 1 && !jpeg_.size())
+	catch (const ParseError& e)
 	{
+		bitmap_.SetSize(1, 1);
+		jpeg_.clear();
 		data_ = data;
+		why_unparsed_ = e.what();
+	}
+	catch (const AStream::failure& e)
+	{
+		bitmap_.SetSize(1, 1);
+		jpeg_.clear();
+		data_ = data;
+		why_unparsed_ = "Error parsing PICT";
 	}
 }
 
@@ -294,7 +296,7 @@ static std::vector<uint8> ExpandPixels(const std::vector<uint8>& scan_line, int 
 	return result;
 }
 
-bool PICTResource::LoadCopyBits(AIStreamBE& stream, bool packed, bool clipped)
+void PICTResource::LoadCopyBits(AIStreamBE& stream, bool packed, bool clipped)
 {
 	if (!packed)
 		stream.ignore(4); // pmBaseAddr
@@ -471,10 +473,9 @@ bool PICTResource::LoadCopyBits(AIStreamBE& stream, bool packed, bool clipped)
 	if (stream.tellg() & 1)
 		stream.ignore(1);
 
-	return true;
 }
 
-bool PICTResource::LoadJPEG(AIStreamBE& stream)
+void PICTResource::LoadJPEG(AIStreamBE& stream)
 {
 	uint32 opcode_size;
 	stream >> opcode_size;
@@ -492,8 +493,7 @@ bool PICTResource::LoadJPEG(AIStreamBE& stream)
 	stream.ignore(4); // rest of matrix
 	if (offset_x != 0 || offset_y != 0)
 	{
-		std::cerr << "Banded JPEG PICT" << std::endl;
-		return false;
+		throw ParseError("PICT contains banded JPEG");
 	}
 
 	uint32 matte_size;
@@ -519,8 +519,7 @@ bool PICTResource::LoadJPEG(AIStreamBE& stream)
 
 	if (codec_type != FOUR_CHARS_TO_INT('j','p','e','g'))
 	{
-		std::cerr << "QuickTime compression only supports JPEG" << std::endl;
-		return false;
+		throw ParseError("Unsupported QuickTime compression codec");
 	}
 
 	stream.ignore(36); // resvd1/resvd2/dataRefIndex/version/revisionLevel/vendor/temporalQuality/spatialQuality/width/height/hRes/vRes
@@ -532,7 +531,6 @@ bool PICTResource::LoadJPEG(AIStreamBE& stream)
 	stream.read(&jpeg_[0], jpeg_.size());
 	
 	stream.ignore(opcode_start + opcode_size - stream.tellg());
-	return true;
 }
 
 template <class T>

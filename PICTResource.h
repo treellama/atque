@@ -24,6 +24,7 @@
 #include "ferro/cstypes.h"
 #include "EasyBMP.h"
 
+#include <stdexcept>
 #include <vector>
 
 class AIStreamBE;
@@ -44,6 +45,9 @@ namespace atque
 		bool Import(const std::string& path);
 		void Export(const std::string& path);
 
+		bool IsUnparsed() { return bitmap_.TellHeight() == 1 && bitmap_.TellWidth() == 1 && jpeg_.size() == 0; }
+		std::string WhyUnparsed() { return why_unparsed_; }
+
 		struct Rect
 		{
 			int16 top;
@@ -62,11 +66,17 @@ namespace atque
 		};
 
 	private:
-		bool LoadCopyBits(AIStreamBE& stream, bool packed, bool clipped);
-		bool LoadJPEG(AIStreamBE& stream);
+		void LoadCopyBits(AIStreamBE& stream, bool packed, bool clipped);
+		void LoadJPEG(AIStreamBE& stream);
 		std::vector<uint8> SaveJPEG() const;
 		std::vector<uint8> SaveBMP() const;
 		BMP bitmap_;
+
+		class ParseError : public std::runtime_error
+		{
+		public:
+			ParseError(const std::string& what) : std::runtime_error(what) {  }
+		};
 
 		struct HeaderOp
 		{
@@ -120,6 +130,8 @@ namespace atque
 
 		std::vector<uint8> data_;
 		std::vector<uint8> jpeg_;
+
+		std::string why_unparsed_;
 	};
 
 }
