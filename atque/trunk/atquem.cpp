@@ -33,8 +33,7 @@ int main(int argc, char *argv[])
 	}
 
 	try {
-		std::vector<std::string> merge_log;
-		atque::merge(argv[1], argv[2], merge_log);
+		atque::merge(argv[1], argv[2], std::cout);
 	}
 	catch (const atque::merge_error& e)
 	{

@@ -21,6 +21,7 @@
 #ifndef MERGE_H
 #define MERGE_H
 
+#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -33,7 +34,7 @@ namespace atque
 		merge_error(const std::string& what) : std::runtime_error(what) { }
 	};
 
-	void merge(const std::string& source, const std::string& destination, std::vector<std::string>& log);
+	void merge(const std::string& source, const std::string& destination, std::ostream& log);
 }
 
 #endif
