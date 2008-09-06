@@ -86,7 +86,7 @@ void MergeShapes(const fs::path& path, marathon::Wad& wad)
 	wad.AddChunk(shapes_tag, shapes_buffer);
 }
 
-void MergeTerminal(const fs::path& path, marathon::Wad& wad)
+void MergeTerminal(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 {
 	try 
 	{
@@ -96,13 +96,11 @@ void MergeTerminal(const fs::path& path, marathon::Wad& wad)
 	}
 	catch (const marathon::TerminalChunk::ParseError& e)
 	{
-		std::ostringstream error;
-		error << path.string() << ": " << e.what();
-		std::cerr << error.str() << std::endl;
+		log << path.string() << ": " << e.what() << "; skipping" << std::endl;
 	}
 }
 
-marathon::Wad CreateWad(const fs::path& path)
+marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 {
 	marathon::Wad wad;
 	std::map<std::string, fs::path> extension_map;
@@ -131,7 +129,7 @@ marathon::Wad CreateWad(const fs::path& path)
 			}
 			if (extension_map.count(".txt"))
 			{
-				MergeTerminal(extension_map[".txt"], wad);
+				MergeTerminal(extension_map[".txt"], wad, log);
 			}
 		}
 	}
@@ -266,7 +264,7 @@ void MergeResources(marathon::Unimap& wadfile, const fs::path& path)
 	}
 }
 
-void atque::merge(const std::string& src, const std::string& dest, std::vector<std::string>& log)
+void atque::merge(const std::string& src, const std::string& dest, std::ostream& log)
 {
 	if (!fs::exists(src))
 	{
@@ -302,7 +300,7 @@ void atque::merge(const std::string& src, const std::string& dest, std::vector<s
 					{
 						std::string level_name;
 						std::getline(s, level_name);
-						wadfile.SetWad(index, CreateWad(*dir));
+						wadfile.SetWad(index, CreateWad(*dir, log));
 						wadfile.SetLevelName(index, utf8_to_mac_roman(level_name));
 					} 
 				}
