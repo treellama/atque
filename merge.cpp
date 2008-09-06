@@ -121,7 +121,7 @@ marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 			
 			if (extension_map.count(".phyA"))
 			{
-				MergePhysics(extension_map[".sceA"], wad);
+				MergePhysics(extension_map[".phyA"], wad);
 			}
 			if (extension_map.count(".ShPa"))
 			{
