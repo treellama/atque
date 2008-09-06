@@ -198,14 +198,15 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 	std::vector<marathon::Unimap::ResourceIdentifier> resources = wadfile.GetResourceIdentifiers();
 	for (std::vector<marathon::Unimap::ResourceIdentifier>::const_iterator it = resources.begin(); it != resources.end(); ++it)
 	{
+		std::ostringstream id;
+		id << std::setw(5) << std::setfill('0') << it->second;
+
 		if (it->first == FOUR_CHARS_TO_INT('P','I','C','T') || it->first == FOUR_CHARS_TO_INT('p','i','c','t'))
 		{
 			fs::path pict_dir = resource_path / "PICT";
 			fs::create_directory(pict_dir);
-			std::ostringstream resource_id;
-			resource_id << it->second;
 			
-			fs::path pict_path = pict_dir / resource_id.str(); 
+			fs::path pict_path = pict_dir / id.str(); 
 			PICTResource pict;
 			if (it->first == FOUR_CHARS_TO_INT('P','I','C','T'))
 			{
@@ -225,20 +226,16 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 		{
 			fs::path text_dir = resource_path / "TEXT";
 			fs::create_directory(text_dir);
-			std::ostringstream resource_id;
-			resource_id << it->second;
 
-			fs::path text_path = text_dir / (resource_id.str() + ".txt");
+			fs::path text_path = text_dir / (id.str() + ".txt");
 			SaveTEXT(wadfile, *it, text_path.string());
 		}
 		else if (it->first == FOUR_CHARS_TO_INT('c','l','u','t'))
 		{
 			fs::path clut_dir = resource_path / "CLUT";
 			fs::create_directory(clut_dir);
-			std::ostringstream resource_id;
-			resource_id << it->second;
 			
-			fs::path clut_path = clut_dir / (resource_id.str() + ".act");
+			fs::path clut_path = clut_dir / (id.str() + ".act");
 			CLUTResource clut(wadfile.GetResource(*it));
 			clut.Export(clut_path.string());
 		}
@@ -246,10 +243,8 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 		{
 			fs::path snd_dir = resource_path / "snd";
 			fs::create_directory(snd_dir);
-			std::ostringstream resource_id;
-			resource_id << it->second;
 			
-			fs::path snd_path = snd_dir / (resource_id.str() + ".wav");
+			fs::path snd_path = snd_dir / (id.str() + ".wav");
 			SndResource snd(wadfile.GetResource(*it));
 			snd.Export(snd_path.string());
 		}
