@@ -124,7 +124,7 @@ void SaveTerminal(marathon::Wad& wad, const std::string& path)
 	}
 }
 
-void atque::split(const std::string& src, const std::string& dest)
+void atque::split(const std::string& src, const std::string& dest, std::ostream& log)
 {
 	if (!fs::exists(src))
 	{
@@ -215,6 +215,9 @@ void atque::split(const std::string& src, const std::string& dest)
 			{
 				pict.LoadRaw(wadfile.GetResource(*it), wadfile.GetResource(marathon::Unimap::ResourceIdentifier(FOUR_CHARS_TO_INT('c','l','u','t'), it->second)));
 			}
+
+			if (pict.IsUnparsed())
+				log << "Exporting PICT " << it->second << " as .pct (" << pict.WhyUnparsed() << ")" << std::endl;
 
 			pict.Export(pict_path.string());
 		}

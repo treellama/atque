@@ -32,7 +32,7 @@ namespace atque
 		split_error(const std::string& what) : std::runtime_error(what) { }
 	};
 
-	void split(const std::string& source, const std::string& destination);
+	void split(const std::string& source, const std::string& destination, std::ostream& log);
 };
 
 #endif

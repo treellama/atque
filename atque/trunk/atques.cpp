@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 	}
 
 	try {
-		atque::split(argv[1], argv[2]);
+		atque::split(argv[1], argv[2], std::cout);
 	}
 	catch (const atque::split_error& e)
 	{
