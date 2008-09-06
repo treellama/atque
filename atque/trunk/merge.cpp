@@ -73,17 +73,24 @@ void MergePhysics(const fs::path& path, marathon::Wad& wad)
 	}
 }
 
-void MergeShapes(const fs::path& path, marathon::Wad& wad)
+void MergeShapes(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 {
 	const uint32 shapes_tag = FOUR_CHARS_TO_INT('S','h','P','a');
 	std::ifstream shapes(path.string().c_str(), std::ios::in | std::ios::binary);
 	shapes.seekg(0, std::ios::end);
 	uint32 length = shapes.tellg();
-	std::vector<uint8> shapes_buffer(length);
-
-	shapes.seekg(0);
-	shapes.read(reinterpret_cast<char*>(&shapes_buffer[0]), shapes_buffer.size());
-	wad.AddChunk(shapes_tag, shapes_buffer);
+	if (length <= 384 * 1024)
+	{
+		std::vector<uint8> shapes_buffer(length);
+		
+		shapes.seekg(0);
+		shapes.read(reinterpret_cast<char*>(&shapes_buffer[0]), shapes_buffer.size());
+		wad.AddChunk(shapes_tag, shapes_buffer);
+	}
+	else
+	{
+		log << path.string() << " is larger than 384K; skipping" << std::endl;
+	}
 }
 
 void MergeTerminal(const fs::path& path, marathon::Wad& wad, std::ostream& log)
@@ -125,7 +132,7 @@ marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 			}
 			if (extension_map.count(".ShPa"))
 			{
-				MergeShapes(extension_map[".ShPa"], wad);
+				MergeShapes(extension_map[".ShPa"], wad, log);
 			}
 			if (extension_map.count(".txt"))
 			{
