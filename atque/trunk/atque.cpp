@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sstream>
 
+#include <wx/config.h>
 #include <wx/filename.h>
 
 // begin wxGlade: ::extracode
@@ -53,10 +54,13 @@ void AtqueWindow::OnAbout(wxCommandEvent &event)
 void AtqueWindow::OnMerge(wxCommandEvent &event)
 {
     // find a directory to merge
+    wxConfig config;
+    wxString Directory;
+    config.Read(wxT("Merge/DefaultDirectory/Load"), &Directory, wxT(""));
     wxDirDialog *openDirDialog = new wxDirDialog(this,
 						 wxT("Choose a folder to merge"),
-						 wxT(""),
-						 wxDD_DIR_MUST_EXIST | wxDD_CHANGE_DIR);
+						 Directory,
+						 wxDD_DIR_MUST_EXIST);
     if (openDirDialog->ShowModal() == wxID_OK)
     {
 	Merge(openDirDialog->GetPath());
@@ -67,12 +71,15 @@ void AtqueWindow::OnMerge(wxCommandEvent &event)
 void AtqueWindow::OnSplit(wxCommandEvent &event)
 {
     // find the user's file
+    wxConfig config;
+    wxString Directory;
+    config.Read(wxT("Split/DefaultDirectory/Load"), &Directory, wxT(""));
     wxFileDialog *openFileDialog = new wxFileDialog(this,
 						    wxT("Choose file"),
-						    wxT(""),
+						    Directory,
 						    wxT(""),
 						    wxT("Scenario files|*.sceA;*.imgA|All files|*.*"),
-						    wxOPEN | wxCHANGE_DIR);
+						    wxOPEN);
     if (openFileDialog->ShowModal() == wxID_OK)
     {
 	Split(openFileDialog->GetPath());
@@ -91,16 +98,21 @@ void AtqueWindow::OnExit(wxCommandEvent &event)
 void AtqueWindow::Split(const wxString& file)
 {
     // find the split destination
+    wxConfig config;
+    wxString Directory;
+    config.Read(wxT("Split/DefaultDirectory/Save"), &Directory, wxT(""));
     wxFileDialog *saveFileDialog = new wxFileDialog(this,
 						    wxT("Split files into folder:"),
-						    wxT(""),
+						    Directory,
 						    wxT("Split Map Folder"),
 						    wxT(""),
-						    wxSAVE | wxCHANGE_DIR | wxOVERWRITE_PROMPT);
+						    wxSAVE | wxOVERWRITE_PROMPT);
     if (saveFileDialog->ShowModal() == wxID_OK)
     {
 	wxBusyCursor busy;
 	wxString filename = saveFileDialog->GetPath();
+	config.Write(wxT("Split/DefaultDirectory/Save"), filename.BeforeLast('/'));
+	config.Write(wxT("Split/DefaultDirectory/Load"), file.BeforeLast('/'));
 	if (wxFileName::FileExists(filename))
 	{
 	    wxRemoveFile(filename);
@@ -135,16 +147,22 @@ void AtqueWindow::Split(const wxString& file)
 void AtqueWindow::Merge(const wxString& folder)
 {
     // find the merge destination
+    wxConfig config;
+    wxString Directory;
+    config.Read(wxT("Merge/DefaultDirectory/Save"), &Directory, wxT(""));
     wxFileDialog *saveFileDialog = new wxFileDialog(this,
 						    wxT("Merge files into:"),
 						    wxT(""),
 						    wxT("Merged Map Files.sceA"),
 						    wxT(""),
-						    wxSAVE | wxCHANGE_DIR | wxOVERWRITE_PROMPT);
+						    wxSAVE | wxOVERWRITE_PROMPT);
     if (saveFileDialog->ShowModal() == wxID_OK)
     {
 	wxBusyCursor busy;
 	wxString filename = saveFileDialog->GetPath();
+
+	config.Write(wxT("Merge/DefaultDirectory/Save"), filename.BeforeLast('/'));
+	config.Write(wxT("Merge/DefaultDirectory/Load"), folder.BeforeLast('/'));
 
 	std::stringstream log;
 	wxLogWindow* logWindow = new wxLogWindow(this,
