@@ -6,6 +6,8 @@ AM_INIT_AUTOMAKE([foreign])
 
 AC_CONFIG_HEADER(config.h)
 
+AC_ARG_ENABLE(gui, [ --enable-gui	build atque GUI [default=yes]], , enable_gui=yes)
+
 AC_LANG(C++)
 
 
@@ -26,17 +28,21 @@ AC_CHECK_LIB(sndfile, sf_open, LIBS="-lsndfile $LIBS", AC_ERROR([Atque requires 
 AX_BOOST_BASE([1.33.1])
 AX_BOOST_FILESYSTEM
 
-AM_OPTIONS_WXCONFIG
+if [[ "x$enable_gui" = "xyes" ]]; then
+AM_OPTIONS_WXCONFIG  
 reqwx=2.8.0
 AM_PATH_WXCONFIG($reqwx, wxWin=1)
-if test "$wxWin" != 1; then
-   AC_MSG_ERROR([Atque requires wxWidgets])
 fi
 
-CPPFLAGS="$CPPFLAGS $WX_CPPFLAGS"
-CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS_ONLY"
-CFLAGS="$CFLAGS $WX_CFLAGS_ONLY"
-LIBS="$LIBS $WX_LIBS"
+if test "$wxWin" != 1; then
+   AC_MSG_WARN([wxWidgets not enabled, building command line tools only])
+else
+   CPPFLAGS="$CPPFLAGS $WX_CPPFLAGS"
+   CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS_ONLY"
+   CFLAGS="$CFLAGS $WX_CFLAGS_ONLY"
+   LIBS="$LIBS $WX_LIBS"
+fi
+AM_CONDITIONAL(BUILD_ATQUEGUI, [test "$wxWin" = 1 ])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
