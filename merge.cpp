@@ -89,7 +89,8 @@ void MergeShapes(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 	}
 	else
 	{
-		log << path.string() << " is larger than 384K; skipping" << std::endl;
+		fs::path file = path.branch_path().leaf() / fs::path(path.leaf());
+		log << file.string() << " is larger than 384K; skipping" << std::endl;
 	}
 }
 
@@ -103,7 +104,8 @@ void MergeTerminal(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 	}
 	catch (const marathon::TerminalChunk::ParseError& e)
 	{
-		log << path.string() << ": " << e.what() << "; skipping" << std::endl;
+		fs::path file = path.branch_path().leaf() / fs::path(path.leaf());
+		log << file.string() << ": " << e.what() << "; skipping" << std::endl;
 	}
 }
 
