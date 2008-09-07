@@ -4,6 +4,7 @@
 #include "split.h"
 #include "merge.h"
 #include <iostream>
+#include <sstream>
 
 #include <wx/filename.h>
 
@@ -102,7 +103,30 @@ void AtqueWindow::Split(const wxString& file)
 	{
 	    wxRemoveFile(filename);
 	}
-	atque::split(std::string(file.mb_str()), std::string(filename.mb_str()), std::cout);
+	std::stringstream log;
+
+	wxLogWindow* logWindow = new wxLogWindow(this,
+						 wxT("Split Log (") + file + wxT(")"),
+						 true,
+						 false);
+	try
+	{
+		atque::split(std::string(file.mb_str()), std::string(filename.mb_str()), log);
+		
+		log.seekg(0);
+		while (!log.eof())
+		{
+			std::string line;
+			getline(log, line);
+			if (line.size())
+				wxLogMessage(wxString(line.c_str(), wxConvUTF8));
+		}
+		wxLogMessage(wxT("Split successful"));
+	}
+	catch (const atque::split_error& e)
+	{
+		wxLogMessage(wxT("Split failed: " + wxString(e.what(), wxConvUTF8)));
+	}
     }
 }
 
@@ -119,7 +143,30 @@ void AtqueWindow::Merge(const wxString& folder)
     {
 	wxBusyCursor busy;
 	wxString filename = saveFileDialog->GetPath();
-	atque::merge(std::string(folder.mb_str()), std::string(filename.mb_str()), std::cout);
+
+	std::stringstream log;
+	wxLogWindow* logWindow = new wxLogWindow(this,
+						 wxT("Merge Log (") + filename + wxT(")"),
+						     true,
+						     false);
+	try
+	{
+		atque::merge(std::string(folder.mb_str()), std::string(filename.mb_str()), log);
+		
+		log.seekg(0);
+		while (!log.eof())
+		{
+			std::string line;
+			getline(log, line);
+			if (line.size())
+				wxLogMessage(wxString(line.c_str(), wxConvUTF8));
+		}
+		wxLogMessage(wxT("Merge successful"));
+	}
+	catch (const atque::merge_error& e)
+	{
+		wxLogMessage(wxT("Merge failed: " + wxString(e.what(), wxConvUTF8)));
+	}
     }
 }
 
