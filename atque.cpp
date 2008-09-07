@@ -193,7 +193,7 @@ void AtqueWindow::do_layout()
 
 bool AtqueDnD::OnDropFiles(wxCoord, wxCoord, const wxArrayString& filenames)
 {
-	if (filenames.Count() == 1)
+	if (filenames.GetCount() == 1)
 	{
 		if (wxFileName::DirExists(filenames[0]))
 		{
