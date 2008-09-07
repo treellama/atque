@@ -2,6 +2,9 @@
 
 #include <wx/wx.h>
 #include <wx/image.h>
+#ifdef wxUSE_DRAG_AND_DROP
+#include <wx/dnd.h>
+#endif
 // begin wxGlade: ::dependencies
 // end wxGlade
 
@@ -48,5 +51,16 @@ public:
     virtual void Merge(const wxString& folder);
 }; // wxGlade: end class
 
+#if wxUSE_DRAG_AND_DROP
+class AtqueDnD : public wxFileDropTarget
+{
+public:
+	AtqueDnD(AtqueWindow *window) { window_ = window; }
+	virtual bool OnDropFiles(wxCoord x, wxCoord y,
+				 const wxArrayString& filenames);
+private:
+	AtqueWindow* window_;
+};
+#endif
 
 #endif // ATQUE_H

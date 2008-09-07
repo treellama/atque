@@ -29,6 +29,8 @@ AtqueWindow::AtqueWindow(wxWindow* parent, int id, const wxString& title, const 
     set_properties();
     do_layout();
     // end wxGlade
+
+    SetDropTarget(new AtqueDnD(this));
 }
 
 
@@ -189,7 +191,24 @@ void AtqueWindow::do_layout()
     // end wxGlade
 }
 
+bool AtqueDnD::OnDropFiles(wxCoord, wxCoord, const wxArrayString& filenames)
+{
+	if (filenames.Count() == 1)
+	{
+		if (wxFileName::DirExists(filenames[0]))
+		{
+			window_->Merge(filenames[0]);
+			return true;
+		}
+		else if (wxFileName::FileExists(filenames[0]))
+		{
+			window_->Split(filenames[0]);
+			return true;
+		}
+	}
 
+	return false;
+}
 
 class Atque: public wxApp {
 public:
