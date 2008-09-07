@@ -8,11 +8,15 @@ EASYBMP_SRCS=EasyBMP.cpp EasyBMP.h EasyBMP_BMP.h EasyBMP_DataStructures.h EasyBM
 
 RESOURCE_SRCS=CLUTResource.h CLUTResource.cpp PICTResource.h PICTResource.cpp SndResource.h SndResource.cpp $(EASYBMP_SRCS)
 
-bin_PROGRAMS=atques atquem
+bin_PROGRAMS=atques atquem atque
 
 atques_SOURCES=atques.cpp split.cpp split.h $(RESOURCE_SRCS) 
 atques_LDADD=$(BOOST_FILESYSTEM_LIB)
 
 atquem_SOURCES=atquem.cpp merge.cpp merge.h $(RESOURCE_SRCS)
 atquem_LDADD=$(BOOST_FILESYSTEM_LIB)
+
+atque_SOURCES=atque.h atque.cpp split.cpp split.h merge.cpp merge.h  $(RESOURCE_SRCS)
+atque_LDADD=$(BOOST_FILESYSTEM_LIB)
+
 

@@ -26,6 +26,18 @@ AC_CHECK_LIB(sndfile, sf_open, LIBS="-lsndfile $LIBS", AC_ERROR([Atque requires 
 AX_BOOST_BASE([1.33.1])
 AX_BOOST_FILESYSTEM
 
+AM_OPTIONS_WXCONFIG
+reqwx=2.8.0
+AM_PATH_WXCONFIG($reqwx, wxWin=1)
+if test "$wxWin" != 1; then
+   AC_MSG_ERROR([Atque requires wxWidgets])
+fi
+
+CPPFLAGS="$CPPFLAGS $WX_CPPFLAGS"
+CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS_ONLY"
+CFLAGS="$CFLAGS $WX_CFLAGS_ONLY"
+LIBS="$LIBS $WX_LIBS"
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 
