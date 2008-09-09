@@ -31,7 +31,7 @@ AtqueWindow::AtqueWindow(wxWindow* parent, int id, const wxString& title, const 
     do_layout();
     // end wxGlade
 
-    SetDropTarget(new AtqueDnD(this));
+    instructions->SetDropTarget(new AtqueDnD(this));
 }
 
 
