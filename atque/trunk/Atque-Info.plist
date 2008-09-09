@@ -4,10 +4,53 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>sceA</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Aleph One Scenario</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>sce∞</string>
+				<string>sce2</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>imgA</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Aleph One Interface Images</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>img°</string>
+				<string>img2</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSPersistentStoreTypeKey</key>
+			<string>Binary</string>
+		</dict>
+	</array>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
+	<key>CFBundleIconFile</key>
+	<string>atque</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.yourcompany.Atque</string>
+	<string>com.alephone.Atque</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>
@@ -15,6 +58,6 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.0</string>
+	<string>0.9</string>
 </dict>
 </plist>
