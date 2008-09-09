@@ -128,12 +128,10 @@ void AtqueWindow::Split(const wxString& file)
 		atque::split(std::string(file.mb_str()), std::string(filename.mb_str()), log);
 		
 		log.seekg(0);
-		while (!log.eof())
+		std::string line;
+		while (getline(log, line))
 		{
-			std::string line;
-			getline(log, line);
-			if (line.size())
-				wxLogMessage(wxString(line.c_str(), wxConvUTF8));
+			wxLogMessage(wxString(line.c_str(), wxConvUTF8));
 		}
 		wxLogMessage(wxT("Split successful"));
 	}
@@ -174,12 +172,10 @@ void AtqueWindow::Merge(const wxString& folder)
 		atque::merge(std::string(folder.mb_str()), std::string(filename.mb_str()), log);
 		
 		log.seekg(0);
-		while (!log.eof())
+		std::string line;
+		while (getline(log, line))
 		{
-			std::string line;
-			getline(log, line);
-			if (line.size())
-				wxLogMessage(wxString(line.c_str(), wxConvUTF8));
+			wxLogMessage(wxString(line.c_str(), wxConvUTF8));
 		}
 		wxLogMessage(wxT("Merge successful"));
 	}
