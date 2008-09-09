@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AE16C0230E760F4800710B6E /* atque.icns in Resources */ = {isa = PBXBuildFile; fileRef = AE16C0220E760F4800710B6E /* atque.icns */; };
+		AE16C02A0E760FB800710B6E /* libsndfile.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = AE175F4E0E74BAE1005BE1E9 /* libsndfile.framework */; };
 		AE175F470E74BAAA005BE1E9 /* atque.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F360E74BAAA005BE1E9 /* atque.cpp */; };
 		AE175F480E74BAAA005BE1E9 /* CLUTResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F380E74BAAA005BE1E9 /* CLUTResource.cpp */; };
 		AE175F490E74BAAA005BE1E9 /* EasyBMP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F3A0E74BAAA005BE1E9 /* EasyBMP.cpp */; };
@@ -17,8 +19,22 @@
 		AE175F4F0E74BAE1005BE1E9 /* libsndfile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE175F4E0E74BAE1005BE1E9 /* libsndfile.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		AE16C0280E760FA700710B6E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				AE16C02A0E760FB800710B6E /* libsndfile.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		AE175F2E0E74BA63005BE1E9 /* Atque.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Atque.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AE16C0220E760F4800710B6E /* atque.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = atque.icns; sourceTree = "<group>"; };
+		AE175F2E0E74BA63005BE1E9 /* Atque.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Atque.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE175F310E74BA63005BE1E9 /* Atque-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Atque-Info.plist"; sourceTree = "<group>"; };
 		AE175F360E74BAAA005BE1E9 /* atque.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = atque.cpp; sourceTree = "<group>"; };
 		AE175F370E74BAAA005BE1E9 /* atque.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = atque.h; sourceTree = "<group>"; };
@@ -52,6 +68,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AE16C01D0E760F1400710B6E /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AE16C0220E760F4800710B6E /* atque.icns */,
+				AE175F4E0E74BAE1005BE1E9 /* libsndfile.framework */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 		AE175F1D0E74BA52005BE1E9 = {
 			isa = PBXGroup;
 			children = (
@@ -73,7 +98,7 @@
 				AE175F450E74BAAA005BE1E9 /* split.cpp */,
 				AE175F460E74BAAA005BE1E9 /* split.h */,
 				AE175F2F0E74BA63005BE1E9 /* Products */,
-				AE175F4E0E74BAE1005BE1E9 /* libsndfile.framework */,
+				AE16C01D0E760F1400710B6E /* Resources */,
 				AE175F310E74BA63005BE1E9 /* Atque-Info.plist */,
 			);
 			sourceTree = "<group>";
@@ -96,6 +121,7 @@
 				AE175F2A0E74BA63005BE1E9 /* Resources */,
 				AE175F2B0E74BA63005BE1E9 /* Sources */,
 				AE175F2C0E74BA63005BE1E9 /* Frameworks */,
+				AE16C0280E760FA700710B6E /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -127,6 +153,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AE16C0230E760F4800710B6E /* atque.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -181,11 +208,15 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
-				HEADER_SEARCH_PATHS = /usr/local/include;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					"$(HOME)/Library/Frameworks/libsndfile.framework/Headers",
+					/Library/Frameworks/libsndfile.framework/Headers,
+				);
 				INFOPLIST_FILE = "Atque-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_CFLAGS = (
-					"-I/usr/local/lib/wx/include/mac-unicode-release-static-2.8",
+					"-I/usr/local/lib/wx/include/mac-ansi-release-static-2.8",
 					"-I/usr/local/include/wx-2.8",
 					"-D_FILE_OFFSET_BITS=64",
 					"-D_LARGE_FILES",
@@ -206,23 +237,18 @@
 					System,
 					"-framework",
 					QuickTime,
-					"-framework",
-					OpenGL,
-					"-framework",
-					AGL,
-					"/usr/local/lib/libwx_macu_richtext-2.8.a",
-					"/usr/local/lib/libwx_macu_aui-2.8.a",
-					"/usr/local/lib/libwx_macu_xrc-2.8.a",
-					"/usr/local/lib/libwx_macu_qa-2.8.a",
-					"/usr/local/lib/libwx_macu_html-2.8.a",
-					"/usr/local/lib/libwx_macu_adv-2.8.a",
-					"/usr/local/lib/libwx_macu_core-2.8.a",
-					"/usr/local/lib/libwx_base_carbonu_xml-2.8.a",
-					"/usr/local/lib/libwx_base_carbonu_net-2.8.a",
-					"/usr/local/lib/libwx_base_carbonu-2.8.a",
+					"/usr/local/lib/libwx_mac_richtext-2.8.a",
+					"/usr/local/lib/libwx_mac_aui-2.8.a",
+					"/usr/local/lib/libwx_mac_xrc-2.8.a",
+					"/usr/local/lib/libwx_mac_qa-2.8.a",
+					"/usr/local/lib/libwx_mac_html-2.8.a",
+					"/usr/local/lib/libwx_mac_adv-2.8.a",
+					"/usr/local/lib/libwx_mac_core-2.8.a",
+					"/usr/local/lib/libwx_base_carbon_xml-2.8.a",
+					"/usr/local/lib/libwx_base_carbon_net-2.8.a",
+					"/usr/local/lib/libwx_base_carbon-2.8.a",
 					"-framework",
 					WebKit,
-					"-lwxregexu-2.8",
 					"-lwxexpat-2.8",
 					"-lwxtiff-2.8",
 					"-lwxjpeg-2.8",
@@ -251,11 +277,15 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
-				HEADER_SEARCH_PATHS = /usr/local/include;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					"$(HOME)/Library/Frameworks/libsndfile.framework/Headers",
+					/Library/Frameworks/libsndfile.framework/Headers,
+				);
 				INFOPLIST_FILE = "Atque-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_CFLAGS = (
-					"-I/usr/local/lib/wx/include/mac-unicode-release-static-2.8",
+					"-I/usr/local/lib/wx/include/mac-ansi-release-static-2.8",
 					"-I/usr/local/include/wx-2.8",
 					"-D_FILE_OFFSET_BITS=64",
 					"-D_LARGE_FILES",
@@ -276,23 +306,18 @@
 					System,
 					"-framework",
 					QuickTime,
-					"-framework",
-					OpenGL,
-					"-framework",
-					AGL,
-					"/usr/local/lib/libwx_macu_richtext-2.8.a",
-					"/usr/local/lib/libwx_macu_aui-2.8.a",
-					"/usr/local/lib/libwx_macu_xrc-2.8.a",
-					"/usr/local/lib/libwx_macu_qa-2.8.a",
-					"/usr/local/lib/libwx_macu_html-2.8.a",
-					"/usr/local/lib/libwx_macu_adv-2.8.a",
-					"/usr/local/lib/libwx_macu_core-2.8.a",
-					"/usr/local/lib/libwx_base_carbonu_xml-2.8.a",
-					"/usr/local/lib/libwx_base_carbonu_net-2.8.a",
-					"/usr/local/lib/libwx_base_carbonu-2.8.a",
+					"/usr/local/lib/libwx_mac_richtext-2.8.a",
+					"/usr/local/lib/libwx_mac_aui-2.8.a",
+					"/usr/local/lib/libwx_mac_xrc-2.8.a",
+					"/usr/local/lib/libwx_mac_qa-2.8.a",
+					"/usr/local/lib/libwx_mac_html-2.8.a",
+					"/usr/local/lib/libwx_mac_adv-2.8.a",
+					"/usr/local/lib/libwx_mac_core-2.8.a",
+					"/usr/local/lib/libwx_base_carbon_xml-2.8.a",
+					"/usr/local/lib/libwx_base_carbon_net-2.8.a",
+					"/usr/local/lib/libwx_base_carbon-2.8.a",
 					"-framework",
 					WebKit,
-					"-lwxregexu-2.8",
 					"-lwxexpat-2.8",
 					"-lwxtiff-2.8",
 					"-lwxjpeg-2.8",
