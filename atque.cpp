@@ -227,6 +227,11 @@ bool AtqueDnD::OnDropFiles(wxCoord, wxCoord, const wxArrayString& filenames)
 class Atque: public wxApp {
 public:
     bool OnInit();
+#ifdef __WXMAC__
+	void MacOpenFile(const wxString& filename);
+#endif
+private:
+	AtqueWindow* Frame;
 };
 
 IMPLEMENT_APP(Atque)
@@ -234,10 +239,22 @@ IMPLEMENT_APP(Atque)
 bool Atque::OnInit()
 {
     wxInitAllImageHandlers();
-    AtqueWindow* Frame = new AtqueWindow(NULL, wxID_ANY, wxEmptyString);
+    Frame = new AtqueWindow(NULL, wxID_ANY, wxEmptyString);
     SetTopWindow(Frame);
     Frame->Show();
     return true;
+}
+
+void Atque::MacOpenFile(const wxString& filename)
+{
+	if (wxFileName::DirExists(filename))
+	{
+		Frame->Merge(filename);
+	}
+	else if (wxFileName::FileExists(filename))
+	{
+		Frame->Split(filename);
+	}
 }
 
 
