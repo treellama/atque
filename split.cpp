@@ -40,6 +40,36 @@
 #include <boost/assign/list_of.hpp>
 #include <boost/filesystem.hpp>
 
+#if defined(__APPLE__) && defined(__MACH__)
+#include <string.h>
+#include <sys/attr.h>
+#include <unistd.h>
+#include <sys/vnode.h>
+
+struct FInfoAttrBuf {
+	unsigned long length;
+	fsobj_type_t objType;
+	char finderInfo[32];
+};
+
+static void set_type_code(const std::string& path, const std::string& type)
+{
+	if (type.size() != 4) 
+		return;
+	attrlist attrList = { ATTR_BIT_MAP_COUNT, 0, ATTR_CMN_OBJTYPE | ATTR_CMN_FNDRINFO, 0, 0, 0, 0 };
+	FInfoAttrBuf attrBuf;
+	if (getattrlist(path.c_str(), &attrList, &attrBuf, sizeof(attrBuf), 0) || attrBuf.objType != VREG)
+		return;
+
+	type.copy(attrBuf.finderInfo, 4);
+	
+	attrList.commonattr = ATTR_CMN_FNDRINFO;
+	setattrlist(path.c_str(), &attrList, attrBuf.finderInfo, sizeof(attrBuf.finderInfo), 0);
+}
+#else
+static void set_type_code(const std::string&, const std::string&) { }
+#endif
+
 namespace fs = boost::filesystem;
 using namespace atque;
 
@@ -75,6 +105,7 @@ void SavePhysics(marathon::Wad& wad, const std::string& name, const std::string&
 		wadfile.data_version(0);
 		wadfile.file_name(name);
 		wadfile.Save(path);
+		set_type_code(path, "phy\260");
 	}
 }
 
@@ -85,6 +116,7 @@ void SaveLevel(marathon::Wad& wad, const std::string& name, const std::string& p
 	wadfile.SetWad(0, wad);
 	wadfile.file_name(name);
 	wadfile.Save(path);
+	set_type_code(path, "sce2");
 }
 
 // removes shapes chunk from Wad, and saves file
@@ -98,6 +130,7 @@ void SaveShapes(marathon::Wad& wad, const std::string& path)
 		{
 			std::ofstream outfile(path.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
 			outfile.write(reinterpret_cast<const char*>(&data[0]), data.size());
+			set_type_code(path, "ShPa");
 		}
 		wad.RemoveChunk(shapes_tag);
 	}
