@@ -38,6 +38,7 @@ protected:
     // begin wxGlade: AtqueWindow::attributes
     wxMenuBar* menuBar;
     wxStaticText* instructions;
+    wxPanel* panel_1;
     // end wxGlade
 
     DECLARE_EVENT_TABLE();

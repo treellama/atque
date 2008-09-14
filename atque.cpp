@@ -13,9 +13,10 @@
 // end wxGlade
 
 AtqueWindow::AtqueWindow(wxWindow* parent, int id, const wxString& title, const wxPoint& pos, const wxSize& size, long style):
-    wxFrame(parent, id, title, pos, size, wxICONIZE|wxMINIMIZE|wxCLOSE_BOX|wxSYSTEM_MENU)
+    wxFrame(parent, id, title, pos, size, wxCAPTION | wxCLOSE_BOX | wxSYSTEM_MENU | wxSIMPLE_BORDER)
 {
     // begin wxGlade: AtqueWindow::AtqueWindow
+    panel_1 = new wxPanel(this, wxID_ANY);
     menuBar = new wxMenuBar();
     wxMenu* fileMenu = new wxMenu();
     fileMenu->Append(wxID_ABOUT, wxT("About Atque..."), wxEmptyString, wxITEM_NORMAL);
@@ -25,7 +26,7 @@ AtqueWindow::AtqueWindow(wxWindow* parent, int id, const wxString& title, const 
     fileMenu->Append(wxID_EXIT, wxT("&Quit"), wxEmptyString, wxITEM_NORMAL);
     menuBar->Append(fileMenu, wxT("File"));
     SetMenuBar(menuBar);
-    instructions = new wxStaticText(this, wxID_ANY, wxT("Drag and drop a file to split, or a folder to merge."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+    instructions = new wxStaticText(panel_1, wxID_ANY, wxT("Drag and drop a file to split, or a folder to merge."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 
     set_properties();
     do_layout();
@@ -197,10 +198,13 @@ void AtqueWindow::set_properties()
 void AtqueWindow::do_layout()
 {
     // begin wxGlade: AtqueWindow::do_layout
-    wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-    sizer->Add(instructions, 0, wxALL, 10);
-    SetSizer(sizer);
-    sizer->Fit(this);
+    wxBoxSizer* sizer_1 = new wxBoxSizer(wxHORIZONTAL);
+    wxBoxSizer* sizer_2 = new wxBoxSizer(wxVERTICAL);
+    sizer_2->Add(instructions, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5);
+    panel_1->SetSizer(sizer_2);
+    sizer_1->Add(panel_1, 1, wxEXPAND, 0);
+    SetSizer(sizer_1);
+    sizer_1->Fit(this);
     Layout();
     // end wxGlade
 }
@@ -256,9 +260,3 @@ void Atque::MacOpenFile(const wxString& filename)
 		Frame->Split(filename);
 	}
 }
-
-
-
-
-
-
