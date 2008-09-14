@@ -156,6 +156,24 @@ void SaveTerminal(marathon::Wad& wad, const std::string& path)
 	}
 }
 
+static std::string sanitize(const std::string& input)
+{
+	std::string result;
+	for (std::string::const_iterator it = input.begin(); it != input.end(); ++it)
+	{
+		if (*it == '/' || *it == '\\')
+		{
+			result.push_back('-');
+		}
+		else
+		{
+			result.push_back(*it);
+		}
+	}
+
+	return result;
+}
+
 void atque::split(const std::string& src, const std::string& dest, std::ostream& log)
 {
 	if (!fs::exists(src))
@@ -191,8 +209,8 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 			try {
 				marathon::MapInfo minf(wad.GetChunk(marathon::MapInfo::kTag));
 				
-				std::string level = wadfile.GetLevelName(*it);
-				std::string actual_level = minf.level_name();
+				std::string level = sanitize(wadfile.GetLevelName(*it));
+				std::string actual_level = sanitize(minf.level_name());
 				std::ostringstream level_number;
 				level_number << std::setw(2) << std::setfill('0') << *it;
 				
