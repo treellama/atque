@@ -161,13 +161,33 @@ static std::string sanitize(const std::string& input)
 	std::string result;
 	for (std::string::const_iterator it = input.begin(); it != input.end(); ++it)
 	{
-		if (*it == '/' || *it == '\\')
+		switch (*it)
 		{
+		case '/':
+#if defined(__WIN32__) || (defined(__APPLE__) && defined(__MACH__))
+		case ':':
+#endif
+#ifdef __WIN32__
+		case '\\':
+		case '"':
+		case '*':
+		case '<':
+		case '>':
+		case '?':
+		case '|':
+#endif
 			result.push_back('-');
-		}
-		else
-		{
-			result.push_back(*it);
+			break;
+		default:
+#ifdef __WIN32__
+			if (*it >= ' ' && *it < 0x7f)
+#else
+			if (*it >= ' ')
+#endif
+			{
+				result.push_back(*it);
+			}
+			break;
 		}
 	}
 
