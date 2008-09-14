@@ -8,7 +8,7 @@ EASYBMP_SRCS=EasyBMP.cpp EasyBMP.h EasyBMP_BMP.h EasyBMP_DataStructures.h EasyBM
 
 RESOURCE_SRCS=CLUTResource.h CLUTResource.cpp PICTResource.h PICTResource.cpp SndResource.h SndResource.cpp $(EASYBMP_SRCS)
 
-EXTRA_DIST=atque.wxg atque.icns Atque-Info.plist EasyBMP_License.txt COPYING.txt atque.xcodeproj/project.pbxproj
+EXTRA_DIST=atque.wxg atque.icns Atque-Info.plist EasyBMP_License.txt COPYING.txt atque.xcodeproj/project.pbxproj atque.rc atque.ico
 
 if BUILD_ATQUEGUI
 if MAKE_WINDOWS
@@ -20,12 +20,12 @@ else
 bin_PROGRAMS=atques atquem
 endif
 
-atques_SOURCES=atques.cpp split.cpp split.h $(RESOURCE_SRCS) 
+atques_SOURCES=atques.cpp split.cpp split.h filesystem.h $(RESOURCE_SRCS) 
 
-atquem_SOURCES=atquem.cpp merge.cpp merge.h $(RESOURCE_SRCS)
+atquem_SOURCES=atquem.cpp merge.cpp merge.h filesystem.h $(RESOURCE_SRCS)
 
 if BUILD_ATQUEGUI
-ATQUE_SOURCES=atque.h atque.cpp split.cpp split.h merge.cpp merge.h $(RESOURCE_SRCS)
+ATQUE_SOURCES=atque.h atque.cpp split.cpp split.h merge.cpp merge.h filesystem.h $(RESOURCE_SRCS)
 if MAKE_WINDOWS
 atque-resources.o:
 	@WX_RESCOMP@ -o atque-resources.o atque.rc

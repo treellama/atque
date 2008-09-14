@@ -24,6 +24,7 @@ case $target in
 *-mingw32*)
 	AC_CHECK_TOOL(WINDRES, windres, :)
 	make_windows=true
+	LDFLAGS="$LDFLAGS -Wl,-S"
 	;;
 *)
 	make_windows=false
