@@ -29,6 +29,7 @@
 #include "ferro/Unimap.h"
 
 #include "split.h"
+#include "filesystem.h"
 #include "CLUTResource.h"
 #include "PICTResource.h"
 #include "SndResource.h"
@@ -38,7 +39,6 @@
 #include <sstream>
 
 #include <boost/assign/list_of.hpp>
-#include <boost/filesystem.hpp>
 
 #if defined(__APPLE__) && defined(__MACH__)
 #include <string.h>
@@ -70,7 +70,6 @@ static void set_type_code(const std::string& path, const std::string& type)
 static void set_type_code(const std::string&, const std::string&) { }
 #endif
 
-namespace fs = boost::filesystem;
 using namespace atque;
 
 const std::vector<uint32> physics_chunks = boost::assign::list_of
@@ -177,10 +176,7 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 
 	if (!fs::exists(dest))
 	{
-		try {
-			fs::create_directory(dest);
-		}
-		catch (const std::runtime_error&)
+		if (!fs::create_directory(dest))
 		{
 			throw split_error("could not create directory");
 		}
@@ -201,7 +197,7 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 				level_number << std::setw(2) << std::setfill('0') << *it;
 				
 				fs::path destfolder = fs::path(dest) / (level_number.str() + " " + mac_roman_to_utf8(level));
-				fs::create_directory(destfolder);
+				destfolder.create_directory();
 				
 				fs::path physics_path = destfolder / (mac_roman_to_utf8(actual_level) + ".phyA");
 				SavePhysics(wad, actual_level, physics_path.string());
@@ -226,7 +222,7 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 	}
 
 	fs::path resource_path = fs::path(dest) / "Resources";
-	fs::create_directory(resource_path);
+	resource_path.create_directory();
 
 	std::vector<marathon::Unimap::ResourceIdentifier> resources = wadfile.GetResourceIdentifiers();
 	for (std::vector<marathon::Unimap::ResourceIdentifier>::const_iterator it = resources.begin(); it != resources.end(); ++it)
@@ -237,7 +233,7 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 		if (it->first == FOUR_CHARS_TO_INT('P','I','C','T') || it->first == FOUR_CHARS_TO_INT('p','i','c','t'))
 		{
 			fs::path pict_dir = resource_path / "PICT";
-			fs::create_directory(pict_dir);
+			pict_dir.create_directory();
 			
 			fs::path pict_path = pict_dir / id.str(); 
 			PICTResource pict;
@@ -258,7 +254,7 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 		else if (it->first == FOUR_CHARS_TO_INT('T','E','X','T') || it->first == FOUR_CHARS_TO_INT('t','e','x','t'))
 		{
 			fs::path text_dir = resource_path / "TEXT";
-			fs::create_directory(text_dir);
+			text_dir.create_directory();
 
 			fs::path text_path = text_dir / (id.str() + ".txt");
 			SaveTEXT(wadfile, *it, text_path.string());
@@ -266,7 +262,7 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 		else if (it->first == FOUR_CHARS_TO_INT('c','l','u','t'))
 		{
 			fs::path clut_dir = resource_path / "CLUT";
-			fs::create_directory(clut_dir);
+			clut_dir.create_directory();
 			
 			fs::path clut_path = clut_dir / (id.str() + ".act");
 			CLUTResource clut(wadfile.GetResource(*it));
@@ -275,7 +271,7 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 		else if (it->first == FOUR_CHARS_TO_INT('s','n','d',' '))
 		{
 			fs::path snd_dir = resource_path / "snd";
-			fs::create_directory(snd_dir);
+			snd_dir.create_directory();
 			
 			fs::path snd_path = snd_dir / (id.str() + ".wav");
 			SndResource snd(wadfile.GetResource(*it));
