@@ -249,6 +249,7 @@ bool Atque::OnInit()
     return true;
 }
 
+#ifdef __WXMAC__
 void Atque::MacOpenFile(const wxString& filename)
 {
 	if (wxFileName::DirExists(filename))
@@ -260,3 +261,5 @@ void Atque::MacOpenFile(const wxString& filename)
 		Frame->Split(filename);
 	}
 }
+#endif
+
