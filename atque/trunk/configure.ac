@@ -18,6 +18,18 @@ AC_PROG_CXXCPP
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 
+echo TARGET: $target
+
+case $target in
+*-mingw32*)
+	AC_CHECK_TOOL(WINDRES, windres, :)
+	make_windows=true
+	;;
+*)
+	make_windows=false
+	;;
+esac
+
 dnl Check for ferro!
 AC_CHECK_HEADERS(ferro/Wadfile.h, , AC_ERROR([You must first install ferro]))
 AC_CHECK_LIB(ferro, main, LIBS="-lferro $LIBS", AC_ERROR([You must first install ferro]))
@@ -42,6 +54,8 @@ else
    LIBS="$LIBS $WX_LIBS"
 fi
 AM_CONDITIONAL(BUILD_ATQUEGUI, [test "$wxWin" = 1 ])
+
+AM_CONDITIONAL(MAKE_WINDOWS, test x$make_windows = xtrue)
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
