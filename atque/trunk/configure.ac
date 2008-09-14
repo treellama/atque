@@ -26,7 +26,6 @@ AC_CHECK_HEADERS([sndfile.h], , AC_ERROR([Atque requires libsndfile]))
 AC_CHECK_LIB(sndfile, sf_open, LIBS="-lsndfile $LIBS", AC_ERROR([Atque requires libsndfile]))
 
 AX_BOOST_BASE([1.33.1])
-AX_BOOST_FILESYSTEM
 
 if [[ "x$enable_gui" = "xyes" ]]; then
 AM_OPTIONS_WXCONFIG  

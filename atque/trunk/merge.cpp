@@ -30,6 +30,7 @@
 #include "ferro/TerminalChunk.h"
 #include "ferro/Unimap.h"
 
+#include "filesystem.h"
 #include "CLUTResource.h"
 #include "PICTResource.h"
 #include "SndResource.h"
@@ -39,10 +40,8 @@
 #include <sstream>
 #include <string>
 
-#include <boost/filesystem.hpp>
 #include <boost/assign/list_of.hpp>
 
-namespace fs = boost::filesystem;
 using namespace atque;
 
 const std::vector<uint32> physics_chunks = boost::assign::list_of
@@ -53,7 +52,7 @@ const std::vector<uint32> physics_chunks = boost::assign::list_of
 	(FOUR_CHARS_TO_INT('W','P','p','x'))
 	;
 
-void MergePhysics(const fs::path& path, marathon::Wad& wad)
+void MergePhysics(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 {
 	marathon::Unimap wadfile;
 	if (wadfile.Open(path.string()))
@@ -62,8 +61,12 @@ void MergePhysics(const fs::path& path, marathon::Wad& wad)
 		marathon::Wad physics = wadfile.GetWad(0);
 		for (std::vector<uint32>::const_iterator it = physics_chunks.begin(); it != physics_chunks.end(); ++it)
 		{
-			if (!wad.HasChunk(*it))
+			if (!physics.HasChunk(*it))
+			{
+				fs::path file = path.parent() / path.filename();
+				log << file.string() << " is not a valid physics model; skipping" << std::endl;
 				return;
+			}
 		}
 
 		for (std::vector<uint32>::const_iterator it = physics_chunks.begin(); it != physics_chunks.end(); ++it)
@@ -89,7 +92,7 @@ void MergeShapes(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 	}
 	else
 	{
-		fs::path file = path.branch_path().leaf() / fs::path(path.leaf());
+		fs::path file = path.parent() / path.filename();
 		log << file.string() << " is larger than 384K; skipping" << std::endl;
 	}
 }
@@ -104,7 +107,7 @@ void MergeTerminal(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 	}
 	catch (const marathon::TerminalChunk::ParseError& e)
 	{
-		fs::path file = path.branch_path().leaf() / fs::path(path.leaf());
+		fs::path file = path.parent() / path.filename();
 		log << file.string() << ": " << e.what() << "; skipping" << std::endl;
 	}
 }
@@ -114,10 +117,10 @@ marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 	marathon::Wad wad;
 	std::map<std::string, fs::path> extension_map;
 
-	fs::directory_iterator end;
-	for (fs::directory_iterator dir(path); dir != end; ++dir)
+	std::vector<fs::path> dir = path.ls();
+	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
 	{
-		extension_map[fs::extension(*dir)] = *dir;
+		extension_map[fs::extension(it->filename())] = *it;
 	}
 
 	if (extension_map.count(".sceA"))
@@ -130,7 +133,7 @@ marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 			
 			if (extension_map.count(".phyA"))
 			{
-				MergePhysics(extension_map[".phyA"], wad);
+				MergePhysics(extension_map[".phyA"], wad, log);
 			}
 			if (extension_map.count(".ShPa"))
 			{
@@ -148,18 +151,18 @@ marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 
 void MergeCLUTs(marathon::Unimap& wadfile, const fs::path& path)
 {
-	fs::directory_iterator end;
-	for (fs::directory_iterator dir(path); dir != end; ++dir)
+	std::vector<fs::path> dir = path.ls();
+	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
 	{
-		if (!fs::is_directory(dir->status()))
+		if (!it->is_directory())
 		{
-			std::istringstream s(dir->leaf());
+			std::istringstream s(it->filename());
 			int16 index;
 			s >> index;
 			if (!s.fail() && index >= 128)
 			{
 				CLUTResource clut;
-				if (clut.Import(dir->string()))
+				if (clut.Import(it->string()))
 				{
 					wadfile.SetResource(FOUR_CHARS_TO_INT('c','l','u','t'), index, clut.Save());
 				}
@@ -170,18 +173,18 @@ void MergeCLUTs(marathon::Unimap& wadfile, const fs::path& path)
 
 void MergePICTs(marathon::Unimap& wadfile, const fs::path& path)
 {
-	fs::directory_iterator end;
-	for (fs::directory_iterator dir(path); dir != end; ++dir)
+	std::vector<fs::path> dir = path.ls();
+	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
 	{
-		if (!fs::is_directory(dir->status()))
+		if (!it->is_directory())
 		{
-			std::istringstream s(dir->leaf());
+			std::istringstream s(it->filename());
 			int16 index;
 			s >> index;
 			if (!s.fail() && index >= 128)
 			{
 				PICTResource pict;
-				if (pict.Import(dir->string()))
+				if (pict.Import(it->string()))
 				{
 					wadfile.SetResource(FOUR_CHARS_TO_INT('P','I','C','T'), index, pict.Save());
 				}
@@ -192,18 +195,18 @@ void MergePICTs(marathon::Unimap& wadfile, const fs::path& path)
 
 void MergeSnds(marathon::Unimap& wadfile, const fs::path& path)
 {
-	fs::directory_iterator end;
-	for (fs::directory_iterator dir(path); dir != end; ++dir)
+	std::vector<fs::path> dir = path.ls();
+	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
 	{
-		if (!fs::is_directory(dir->status()))
+		if (!it->is_directory())
 		{
-			std::istringstream s(dir->leaf());
+			std::istringstream s(it->filename());
 			int16 index;
 			s >> index;
 			if (!s.fail() && index >= 128)
 			{
 				SndResource snd;
-				if (snd.Import(dir->string()))
+				if (snd.Import(it->string()))
 				{
 					wadfile.SetResource(FOUR_CHARS_TO_INT('s','n','d',' '), index, snd.Save());
 				}
@@ -229,17 +232,17 @@ static std::vector<uint8> ReadFile(const std::string& path)
 
 void MergeTEXTs(marathon::Unimap& wadfile, const fs::path& path)
 {
-	fs::directory_iterator end;
-	for (fs::directory_iterator dir(path); dir != end; ++dir)
+	std::vector<fs::path> dir = path.ls();
+	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
 	{
-		if (!fs::is_directory(dir->status()))
+		if (!it->is_directory())
 		{
-			std::istringstream s(dir->leaf());
+			std::istringstream s(it->filename());
 			int16 index;
 			s >> index;
 			if (!s.fail() && index >= 128)
 			{
-				wadfile.SetResource(FOUR_CHARS_TO_INT('t','e','x','t'), index, ReadFile(dir->string()));
+				wadfile.SetResource(FOUR_CHARS_TO_INT('t','e','x','t'), index, ReadFile(it->string()));
 			}
 		}
 	}
@@ -248,26 +251,26 @@ void MergeTEXTs(marathon::Unimap& wadfile, const fs::path& path)
 
 void MergeResources(marathon::Unimap& wadfile, const fs::path& path)
 {
-	fs::directory_iterator end;
-	for (fs::directory_iterator dir(path); dir != end; ++dir)
+	std::vector<fs::path> dir = path.ls();
+	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
 	{
-		if (fs::is_directory(dir->status()))
+		if (it->is_directory())
 		{
-			if (dir->leaf() == "TEXT")
+			if (it->filename() == "TEXT")
 			{
-				MergeTEXTs(wadfile, *dir);
+				MergeTEXTs(wadfile, *it);
 			}
-			else if (dir->leaf() == "CLUT")
+			else if (it->filename() == "CLUT")
 			{
-				MergeCLUTs(wadfile, *dir);
+				MergeCLUTs(wadfile, *it);
 			}
-			else if (dir->leaf() == "PICT")
+			else if (it->filename() == "PICT")
 			{
-				MergePICTs(wadfile, *dir);
+				MergePICTs(wadfile, *it);
 			}
-			else if (dir->leaf() == "snd")
+			else if (it->filename() == "snd")
 			{
-				MergeSnds(wadfile, *dir);
+				MergeSnds(wadfile, *it);
 			}
 		}
 	}
@@ -286,18 +289,18 @@ void atque::merge(const std::string& src, const std::string& dest, std::ostream&
 
 	marathon::Unimap wadfile;
 
-	fs::directory_iterator end;
-	for (fs::directory_iterator dir(src); dir != end; ++dir)
+	std::vector<fs::path> dir = fs::path(src).ls();
+	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
 	{
-		if (fs::is_directory(dir->status()))
+		if (it->is_directory())
 		{
-			if (dir->leaf() == "Resources")
+			if (it->filename() == "Resources")
 			{
-				MergeResources(wadfile, *dir);
+				MergeResources(wadfile, *it);
 			}
 			else
 			{
-				std::istringstream s(dir->leaf());
+				std::istringstream s(it->filename());
 				int16 index;
 				s >> index;
 				if (!s.fail())
@@ -309,7 +312,7 @@ void atque::merge(const std::string& src, const std::string& dest, std::ostream&
 					{
 						std::string level_name;
 						std::getline(s, level_name);
-						wadfile.SetWad(index, CreateWad(*dir, log));
+						wadfile.SetWad(index, CreateWad(*it, log));
 						wadfile.SetLevelName(index, utf8_to_mac_roman(level_name));
 					} 
 				}
@@ -317,7 +320,7 @@ void atque::merge(const std::string& src, const std::string& dest, std::ostream&
 		}
 	}
 
-	wadfile.file_name(fs::basename(dest));
+	wadfile.file_name(fs::basename(fs::path(dest).filename()));
 	wadfile.Save(dest);
 	
 }

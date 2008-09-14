@@ -17,14 +17,11 @@ bin_PROGRAMS=atques atquem
 endif
 
 atques_SOURCES=atques.cpp split.cpp split.h $(RESOURCE_SRCS) 
-atques_LDADD=$(BOOST_FILESYSTEM_LIB)
 
 atquem_SOURCES=atquem.cpp merge.cpp merge.h $(RESOURCE_SRCS)
-atquem_LDADD=$(BOOST_FILESYSTEM_LIB)
 
 if BUILD_ATQUEGUI
 atque_SOURCES=atque.h atque.cpp split.cpp split.h merge.cpp merge.h  $(RESOURCE_SRCS)
-atque_LDADD=$(BOOST_FILESYSTEM_LIB)
 endif
 
 
