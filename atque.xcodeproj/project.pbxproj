@@ -223,7 +223,6 @@
 					"-D__WXMAC__",
 				);
 				OTHER_LDFLAGS = (
-					"-lboost_filesystem-d",
 					"-lm",
 					/usr/local/lib/libferro.a,
 					"-L/usr/local/lib",
@@ -292,7 +291,6 @@
 					"-D__WXMAC__",
 				);
 				OTHER_LDFLAGS = (
-					"-lboost_filesystem-d",
 					"-lm",
 					/usr/local/lib/libferro.a,
 					"-L/usr/local/lib",
