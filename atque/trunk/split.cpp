@@ -229,8 +229,19 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 			try {
 				marathon::MapInfo minf(wad.GetChunk(marathon::MapInfo::kTag));
 				
-				std::string level = sanitize(wadfile.GetLevelName(*it));
-				std::string actual_level = sanitize(minf.level_name());
+				std::string level = wadfile.GetLevelName(*it);
+				std::string actual_level = minf.level_name();
+				if (level != actual_level)
+				{
+					fs::path level_select_path(dest);
+					level_select_path = level_select_path / "Level Select Names.txt";
+					std::ofstream level_select_names(level_select_path.string().c_str(), std::ios::out | std::ios::app);
+					level_select_names << std::setw(2) << std::setfill('0') << *it << " " << level << std::endl;
+				}
+
+				level = sanitize(level);
+				actual_level = sanitize(actual_level);
+
 				std::ostringstream level_number;
 				level_number << std::setw(2) << std::setfill('0') << *it;
 				

@@ -276,6 +276,33 @@ void MergeResources(marathon::Unimap& wadfile, const fs::path& path)
 	}
 }
 
+static std::string get_line(std::istream& stream)
+{
+	std::string line;
+	char c;
+	stream.get(c);
+	while (!stream.eof() && c != '\n' && c != '\r')
+	{
+		if (c == '\r')
+		{
+			if (!stream.eof() && stream.peek() == '\n')
+			{
+				stream.ignore(1);
+			}
+		}
+		else if (c != '\n' && c != '\0')
+		{
+			line += c;
+		}
+
+		stream.get(c);
+
+	};
+
+	return line;
+}
+
+
 void atque::merge(const std::string& src, const std::string& dest, std::ostream& log)
 {
 	if (!fs::exists(src))
@@ -288,6 +315,23 @@ void atque::merge(const std::string& src, const std::string& dest, std::ostream&
 	}
 
 	marathon::Unimap wadfile;
+	fs::path level_select_path(src);
+	level_select_path = level_select_path / "Level Select Names.txt";
+	
+	std::map<int16, std::string> level_select_names;
+	if (level_select_path.exists())
+	{
+		std::ifstream s(level_select_path.string().c_str());
+		while (!s.eof() && !s.fail())
+		{
+			int16 index;
+			s >> index;
+			if (!s.fail())
+			{
+				level_select_names[index] = get_line(s);
+			}
+		}
+	}
 
 	std::vector<fs::path> dir = fs::path(src).ls();
 	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
@@ -313,7 +357,8 @@ void atque::merge(const std::string& src, const std::string& dest, std::ostream&
 						std::string level_name;
 						std::getline(s, level_name);
 						wadfile.SetWad(index, CreateWad(*it, log));
-						wadfile.SetLevelName(index, utf8_to_mac_roman(level_name));
+						if (level_select_names.count(index))
+							wadfile.SetLevelName(index, utf8_to_mac_roman(level_select_names[index]));
 					} 
 				}
 			}
