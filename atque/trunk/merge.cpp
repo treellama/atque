@@ -357,11 +357,17 @@ void atque::merge(const std::string& src, const std::string& dest, std::ostream&
 						std::string level_name;
 						std::getline(s, level_name);
 						wadfile.SetWad(index, CreateWad(*it, log));
-						if (level_select_names.count(index))
-							wadfile.SetLevelName(index, utf8_to_mac_roman(level_select_names[index]));
 					} 
 				}
 			}
+		}
+	}
+
+	for (std::map<int16, std::string>::iterator it = level_select_names.begin(); it != level_select_names.end(); ++it)
+	{
+		if (wadfile.HasWad(it->first))
+		{
+			wadfile.SetLevelName(it->first, utf8_to_mac_roman(it->second));
 		}
 	}
 

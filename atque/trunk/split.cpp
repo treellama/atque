@@ -37,6 +37,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <set>
 
 #include <boost/assign/list_of.hpp>
 
@@ -220,6 +221,8 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 		}
 	}
 
+	std::map<int16, std::string> level_select_names;
+
 	std::vector<int16> indexes = wadfile.GetWadIndexes();
 	for (std::vector<int16>::iterator it = indexes.begin(); it != indexes.end(); ++it)
 	{
@@ -233,10 +236,7 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 				std::string actual_level = minf.level_name();
 				if (level != actual_level)
 				{
-					fs::path level_select_path(dest);
-					level_select_path = level_select_path / "Level Select Names.txt";
-					std::ofstream level_select_names(level_select_path.string().c_str(), std::ios::out | std::ios::app);
-					level_select_names << std::setw(2) << std::setfill('0') << *it << " " << level << std::endl;
+					level_select_names[*it] = level;
 				}
 
 				level = sanitize(level);
@@ -273,9 +273,18 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 	fs::path resource_path = fs::path(dest) / "Resources";
 	resource_path.create_directory();
 
+	std::map<int16, std::string> resource_names;
+
 	std::vector<marathon::Unimap::ResourceIdentifier> resources = wadfile.GetResourceIdentifiers();
 	for (std::vector<marathon::Unimap::ResourceIdentifier>::const_iterator it = resources.begin(); it != resources.end(); ++it)
 	{
+		if (!level_select_names.count(it->second))
+		{
+			std::string resource_name = wadfile.GetResourceName(it->second);
+			if (!resource_name.empty())
+				level_select_names[it->second] = resource_name;
+		}
+
 		std::ostringstream id;
 		id << std::setw(5) << std::setfill('0') << it->second;
 
@@ -325,6 +334,17 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 			fs::path snd_path = snd_dir / (id.str() + ".wav");
 			SndResource snd(wadfile.GetResource(*it));
 			snd.Export(snd_path.string());
+		}
+	}
+
+	if (level_select_names.size())
+	{
+		fs::path level_select_path(dest);
+		level_select_path = level_select_path / "Level Select Names.txt";
+		std::ofstream s(level_select_path.string().c_str(), std::ios::out);
+		for (std::map<int16, std::string>::iterator it = level_select_names.begin(); it != level_select_names.end(); ++it)
+		{
+			s << it->first << " " << mac_roman_to_utf8(it->second) << std::endl;
 		}
 	}
 }
