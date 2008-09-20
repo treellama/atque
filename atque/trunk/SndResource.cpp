@@ -27,6 +27,8 @@
 
 using namespace atque;
 
+static const int kBufferSize = 8192;
+
 bool SndResource::Load(const std::vector<uint8>& data)
 {
 	AIStreamBE stream(&data[0], data.size());
@@ -242,19 +244,24 @@ bool SndResource::Import(const std::string& path)
 	if (!outfile) 
 		return false;
 
-	for (int i = 0; i < inputInfo.frames; ++i)
+	int frames_remaining = inputInfo.frames;
+	while (frames_remaining)
 	{
-		int frame[2];
-		if (sf_readf_int(infile, frame, 1) != 1)
+		int buf[kBufferSize * 2];
+		int frames = std::min(kBufferSize, frames_remaining);
+		
+		if (sf_readf_int(infile, buf, frames) != frames)
 		{
 			std::cerr << "Read error" << std::endl;
 			return false;
 		}
-		if (sf_writef_int(outfile, frame, 1) != 1)
+		if (sf_writef_int(outfile, buf, frames) != frames)
 		{
 			std::cerr << "Write error" << std::endl;
 			return false;
 		}
+
+		frames_remaining -= frames;
 	}
 
 	sf_close(infile);
@@ -305,20 +312,24 @@ void SndResource::Export(const std::string& path) const
 
 	SNDFILE *infile = sf_open_virtual(&virtual_io, SFM_READ, &inputInfo, &adapter);
 
-	int frames = data_.size() / bytes_per_frame_;
-	for (int i = 0; i < frames; ++i)
+	int frames_remaining = data_.size() / bytes_per_frame_;
+	while (frames_remaining)
 	{
-		int frame[2];
-		if (sf_readf_int(infile, frame, 1) != 1)
+		int buf[kBufferSize * 2];
+		int frames = std::min(kBufferSize, frames_remaining);
+		if (sf_readf_int(infile, buf, frames) != frames)
 		{
 			std::cerr << "Read error" << std::endl;
 			return;
 		}
-		if (sf_writef_int(outfile, frame, 1) != 1)
+
+		if (sf_writef_int(outfile, buf, frames) != frames)
 		{
 			std::cerr << "Write error (" << sf_strerror(outfile) << ")" << std::endl;
 			return;
 		}
+
+		frames_remaining -= frames;
 	}
 
 	sf_close(infile);
