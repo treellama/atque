@@ -13,7 +13,11 @@
 // end wxGlade
 
 AtqueWindow::AtqueWindow(wxWindow* parent, int id, const wxString& title, const wxPoint& pos, const wxSize& size, long style):
-    wxFrame(parent, id, title, pos, size, wxCAPTION | wxCLOSE_BOX | wxSYSTEM_MENU | wxSIMPLE_BORDER)
+	wxFrame(parent, id, title, pos, size, wxCAPTION | wxCLOSE_BOX | wxSYSTEM_MENU
+#if defined(__WIN32__) || (defined(__APPLE__) && defined(__MACH__))
+		| wxSIMPLE_BORDER
+#endif
+		)
 {
     // begin wxGlade: AtqueWindow::AtqueWindow
     panel_1 = new wxPanel(this, wxID_ANY);
