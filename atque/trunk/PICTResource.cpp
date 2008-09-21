@@ -1054,11 +1054,11 @@ bool PICTResource::Import(const std::string& path)
 {
 	data_.clear();
 	jpeg_.clear();
-	if (algo::ends_with(path, ".bmp"))
+	if (algo::iends_with(path, ".bmp"))
 	{
 		bitmap_.ReadFromFile(path.c_str());
 	}
-	else if (algo::ends_with(path, ".jpg"))
+	else if (algo::iends_with(path, ".jpg"))
 	{
 		std::ifstream infile(path.c_str(), std::ios::binary);
 		infile.seekg(0, std::ios::end);
