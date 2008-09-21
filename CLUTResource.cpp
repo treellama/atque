@@ -93,7 +93,7 @@ std::vector<uint8> CLUTResource::Save() const
 
 bool CLUTResource::Import(const std::string& path)
 {
-	if (algo::ends_with(path, ".act"))
+	if (algo::iends_with(path, ".act"))
 	{
 		std::ifstream infile(path.c_str(), std::ios::binary);
 		infile.seekg(0, std::ios::end);
@@ -128,7 +128,7 @@ bool CLUTResource::Import(const std::string& path)
 		
 		return true;
 	}
-	else if (algo::ends_with(path, ".bmp"))
+	else if (algo::iends_with(path, ".bmp"))
 	{
 		BMP bitmap;
 		if (bitmap.ReadFromFile(path.c_str()) && bitmap.TellNumberOfColors() <= 256)
