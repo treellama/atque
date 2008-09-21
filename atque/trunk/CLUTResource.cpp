@@ -21,9 +21,14 @@
 #include "ferro/AStream.h"
 #include "CLUTResource.h"
 
+#include "EasyBMP.h"
+
 #include <fstream>
 
+#include <boost/algorithm/string/predicate.hpp>
+
 using namespace atque;
+namespace algo = boost::algorithm;
 
 void CLUTResource::Load(const std::vector<uint8>& data)
 {
@@ -88,38 +93,60 @@ std::vector<uint8> CLUTResource::Save() const
 
 bool CLUTResource::Import(const std::string& path)
 {
-	std::ifstream infile(path.c_str(), std::ios::binary);
-	infile.seekg(0, std::ios::end);
-	uint32 size = infile.tellg();
-	if (size < 3 * 256)
-		return false;
-
-	std::vector<uint8> actData(size);
-	infile.read(reinterpret_cast<char*>(&actData[0]), actData.size());
-	AIStreamBE stream(&actData[0], actData.size());
-	colors_.resize(256);
-	for (int i = 0; i < colors_.size(); ++i)
+	if (algo::ends_with(path, ".act"))
 	{
-		uint8 red;
-		uint8 green;
-		uint8 blue;
+		std::ifstream infile(path.c_str(), std::ios::binary);
+		infile.seekg(0, std::ios::end);
+		uint32 size = infile.tellg();
+		if (size < 3 * 256)
+			return false;
+		
+		std::vector<uint8> actData(size);
+		infile.read(reinterpret_cast<char*>(&actData[0]), actData.size());
+		AIStreamBE stream(&actData[0], actData.size());
+		colors_.resize(256);
+		for (int i = 0; i < colors_.size(); ++i)
+		{
+			uint8 red;
+			uint8 green;
+			uint8 blue;
+			
+			stream >> red >> green >> blue;
+			
+			colors_[i].red = red << 8;
+			colors_[i].green = green << 8;
+			colors_[i].blue = blue << 8;
+		}
+		
+		if (size >= 3 * 256 + 4)
+		{
+			int16 colorCount;
+			stream >> colorCount;
+			if (colorCount < 256)
+				colors_.resize(colorCount);
+		}
+		
+		return true;
+	}
+	else if (algo::ends_with(path, ".bmp"))
+	{
+		BMP bitmap;
+		if (bitmap.ReadFromFile(path.c_str()) && bitmap.TellNumberOfColors() <= 256)
+		{
+			colors_.resize(256);
+			for (int i = 0; i < bitmap.TellNumberOfColors(); ++i)
+			{
+				RGBApixel color = bitmap.GetColor(i);
+				colors_[i].red = color.Red << 8;
+				colors_[i].green = color.Green << 8;
+				colors_[i].blue = color.Blue << 8;
+			}
 
-		stream >> red >> green >> blue;
-
-		colors_[i].red = red << 8;
-		colors_[i].green = green << 8;
-		colors_[i].blue = blue << 8;
+			return true;
+		}
 	}
 
-	if (size >= 3 * 256 + 4)
-	{
-		int16 colorCount;
-		stream >> colorCount;
-		if (colorCount < 256)
-			colors_.resize(colorCount);
-	}
-
-	return true;
+	return false;
 }
 
 void CLUTResource::Export(const std::string& path) const
