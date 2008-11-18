@@ -53,7 +53,10 @@ namespace fs
 		}
 
 		bool exists() const {
-			return (access(path_.c_str(), R_OK) == 0);
+			if (path_.empty())
+				return false;
+			else
+				return (access(path_.c_str(), R_OK) == 0);
 		}
 
 		bool is_directory() const {
@@ -163,7 +166,7 @@ namespace fs
 		std::string::size_type pos = filename.rfind('.');
 		if (pos != std::string::npos)
 		{
-			return filename.substr(0, pos - 1);
+			return filename.substr(0, pos);
 		}
 		else
 			return filename;

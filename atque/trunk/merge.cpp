@@ -27,6 +27,7 @@
 #include "ferro/cstypes.h"
 #include "ferro/macroman.h"
 #include "ferro/Wad.h"
+#include "ferro/ScriptChunk.h"
 #include "ferro/TerminalChunk.h"
 #include "ferro/Unimap.h"
 
@@ -41,8 +42,10 @@
 #include <string>
 
 #include <boost/assign/list_of.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
 
 using namespace atque;
+namespace algo = boost::algorithm;
 
 const std::vector<uint32> physics_chunks = boost::assign::list_of
 	(FOUR_CHARS_TO_INT('M','N','p','x'))
@@ -51,6 +54,21 @@ const std::vector<uint32> physics_chunks = boost::assign::list_of
 	(FOUR_CHARS_TO_INT('P','X','p','x'))
 	(FOUR_CHARS_TO_INT('W','P','p','x'))
 	;
+
+static std::vector<uint8> ReadFile(const std::string& path)
+{
+	std::ifstream infile;
+	infile.open(path.c_str(), std::ios::binary);
+	
+	infile.seekg(0, std::ios::end);
+	int length = infile.tellg();
+	infile.seekg(0, std::ios::beg);
+
+	std::vector<uint8> data(length);
+	infile.read(reinterpret_cast<char *>(&data[0]), data.size());
+
+	return data;
+}
 
 void MergePhysics(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 {
@@ -112,36 +130,99 @@ void MergeTerminal(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 	}
 }
 
+void MergeScripts(const std::vector<fs::path> paths, marathon::Wad& wad, uint32 tag)
+{
+	marathon::ScriptChunk chunk;
+	for (std::vector<fs::path>::const_iterator it = paths.begin(); it != paths.end(); ++it)
+	{
+		marathon::ScriptChunk::Script script;
+		script.name = fs::basename(it->filename());
+		script.data = ReadFile(it->string());
+		chunk.AddScript(script);
+	}
+
+	wad.AddChunk(tag, chunk.Save());
+}
+
+struct SortScriptPaths
+{
+	bool operator() (const fs::path& a, const fs::path& b) {
+		std::string as = a.string();
+		std::string bs = b.string();
+		algo::to_lower(as);
+		algo::to_lower(bs);
+		return as < bs;
+	}
+};
+
 marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 {
 	marathon::Wad wad;
-	std::map<std::string, fs::path> extension_map;
 
-	std::vector<fs::path> dir = path.ls();
+	std::vector<fs::path> maps;
+	std::vector<fs::path> physics;
+	std::vector<fs::path> shapes;
+	std::vector<fs::path> terminals;
+	std::vector<fs::path> luas;
+	std::vector<fs::path> mmls;
+	
+	std::vector<fs::path> dir = path.ls();	
 	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
 	{
-		extension_map[fs::extension(it->filename())] = *it;
+		std::string extension = fs::extension(it->filename());
+		if (extension == ".sceA")
+			maps.push_back(*it);
+		else if (extension == ".phyA")
+			physics.push_back(*it);
+		else if (extension == ".ShPa")
+			shapes.push_back(*it);
+		else if (extension == ".txt")
+			terminals.push_back(*it);
+		else if (extension == ".lua")
+			luas.push_back(*it);
+		else if (extension == ".mml")
+			mmls.push_back(*it);
 	}
 
-	if (extension_map.count(".sceA"))
+	if (maps.size())
 	{
+		if (maps.size() > 1)
+			log << path.string() << ": multiple maps found; using " << maps[0].string() << std::endl;
+
 		marathon::Unimap wadfile;
-		if (wadfile.Open(extension_map[".sceA"].string()) && wadfile.data_version() == 1)
+		if (wadfile.Open(maps[0].string()) && wadfile.data_version() == 1)
 		{
 			wad = wadfile.GetWad(0);
 
 			
-			if (extension_map.count(".phyA"))
+			if (physics.size())
 			{
-				MergePhysics(extension_map[".phyA"], wad, log);
+				if (physics.size() > 1)
+					log << path.string() << ": multiple physics models found; using " << physics[0].string() << std::endl;
+
+				MergePhysics(physics[0], wad, log);
 			}
-			if (extension_map.count(".ShPa"))
+			if (shapes.size())
 			{
-				MergeShapes(extension_map[".ShPa"], wad, log);
+				if (shapes.size() > 1)
+					log << path.string() << ": multiple shapes patches found; using " << shapes[0].string() << std::endl;
+				MergeShapes(shapes[0], wad, log);
 			}
-			if (extension_map.count(".txt"))
+			if (terminals.size())
 			{
-				MergeTerminal(extension_map[".txt"], wad, log);
+				if (terminals.size() > 1)
+					log << path.string() << ": multiple terminal texts files found; using " << terminals[0].string() << std::endl;
+				MergeTerminal(terminals[0], wad, log);
+			}
+			if (luas.size())
+			{
+				std::sort(luas.begin(), luas.end(), SortScriptPaths());
+				MergeScripts(luas, wad, marathon::ScriptChunk::kLuaTag);
+			}
+			if (mmls.size())
+			{
+				std::sort(mmls.begin(), mmls.end(), SortScriptPaths());
+				MergeScripts(mmls, wad, marathon::ScriptChunk::kMMLTag);
 			}
 		}
 	}
@@ -213,21 +294,6 @@ void MergeSnds(marathon::Unimap& wadfile, const fs::path& path)
 			}
 		}
 	}
-}
-
-static std::vector<uint8> ReadFile(const std::string& path)
-{
-	std::ifstream infile;
-	infile.open(path.c_str(), std::ios::binary);
-	
-	infile.seekg(0, std::ios::end);
-	int length = infile.tellg();
-	infile.seekg(0, std::ios::beg);
-
-	std::vector<uint8> data(length);
-	infile.read(reinterpret_cast<char *>(&data[0]), data.size());
-
-	return data;
 }
 
 void MergeTEXTs(marathon::Unimap& wadfile, const fs::path& path)
@@ -328,6 +394,7 @@ void atque::merge(const std::string& src, const std::string& dest, std::ostream&
 			s >> index;
 			if (!s.fail())
 			{
+				s.ignore();
 				level_select_names[index] = get_line(s);
 			}
 		}

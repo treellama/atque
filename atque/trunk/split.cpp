@@ -24,6 +24,7 @@
 
 #include "ferro/macroman.h"
 #include "ferro/MapInfoChunk.h"
+#include "ferro/ScriptChunk.h"
 #include "ferro/TerminalChunk.h"
 #include "ferro/Wadfile.h"
 #include "ferro/Unimap.h"
@@ -134,6 +135,51 @@ void SaveShapes(marathon::Wad& wad, const std::string& path)
 		}
 		wad.RemoveChunk(shapes_tag);
 	}
+}
+
+void SaveScripts(marathon::Wad& wad, const fs::path& dir)
+{
+	using marathon::ScriptChunk;
+
+	if (wad.HasChunk(ScriptChunk::kLuaTag))
+	{
+		ScriptChunk luas(wad.GetChunk(ScriptChunk::kLuaTag));
+		std::list<ScriptChunk::Script> scripts = luas.GetScripts();
+		for (std::list<ScriptChunk::Script>::const_iterator it = scripts.begin(); it != scripts.end(); ++it)
+		{
+			if (it->data.size())
+			{
+				std::string filename = it->name + ".lua";
+				fs::path path = dir / filename;
+
+				std::ofstream outfile(path.string().c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+				outfile.write(reinterpret_cast<const char*>(&it->data[0]), it->data.size());
+			}
+		}
+
+		wad.RemoveChunk(ScriptChunk::kLuaTag);
+	}
+
+	if (wad.HasChunk(ScriptChunk::kMMLTag))
+	{
+		ScriptChunk mmls(wad.GetChunk(ScriptChunk::kMMLTag));
+		std::list<ScriptChunk::Script> scripts = mmls.GetScripts();
+		for (std::list<ScriptChunk::Script>::const_iterator it = scripts.begin(); it != scripts.end(); ++it)
+		{
+			if (it->data.size())
+			{
+				std::string filename = it->name + ".mml";
+				fs::path path = dir / filename;
+				
+				std::ofstream outfile(path.string().c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+				outfile.write(reinterpret_cast<const char*>(&it->data[0]), it->data.size());
+			}
+		}
+
+		wad.RemoveChunk(ScriptChunk::kMMLTag);
+		
+	}
+
 }
 
 void SaveTEXT(marathon::Unimap& wad, marathon::Unimap::ResourceIdentifier id, const std::string& path)
@@ -256,6 +302,8 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 				
 				fs::path terminal_path = destfolder / (mac_roman_to_utf8(actual_level) + ".term.txt");
 				SaveTerminal(wad, terminal_path.string());
+
+				SaveScripts(wad, destfolder);
 				
 				fs::path level_path = destfolder / (mac_roman_to_utf8(actual_level) + ".sceA");
 				SaveLevel(wad, actual_level, level_path.string());
