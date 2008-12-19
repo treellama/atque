@@ -227,9 +227,9 @@ static std::string sanitize(const std::string& input)
 			break;
 		default:
 #ifdef __WIN32__
-			if (*it >= ' ' && *it < 0x7f)
+			if (static_cast<unsigned char>(*it) >= ' ' && static_cast<unsigned char>(*it) < 0x7f)
 #else
-			if (*it >= ' ')
+			if (static_cast<unsigned char>(*it) >= ' ')
 #endif
 			{
 				result.push_back(*it);
