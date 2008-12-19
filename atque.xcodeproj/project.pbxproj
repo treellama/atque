@@ -216,7 +216,7 @@
 				INFOPLIST_FILE = "Atque-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_CFLAGS = (
-					"-I/usr/local/lib/wx/include/mac-ansi-release-static-2.8",
+					"-I/usr/local/lib/wx/include/mac-unicode-release-static-2.8",
 					"-I/usr/local/include/wx-2.8",
 					"-D_FILE_OFFSET_BITS=64",
 					"-D_LARGE_FILES",
@@ -236,18 +236,19 @@
 					System,
 					"-framework",
 					QuickTime,
-					"/usr/local/lib/libwx_mac_richtext-2.8.a",
-					"/usr/local/lib/libwx_mac_aui-2.8.a",
-					"/usr/local/lib/libwx_mac_xrc-2.8.a",
-					"/usr/local/lib/libwx_mac_qa-2.8.a",
-					"/usr/local/lib/libwx_mac_html-2.8.a",
-					"/usr/local/lib/libwx_mac_adv-2.8.a",
-					"/usr/local/lib/libwx_mac_core-2.8.a",
-					"/usr/local/lib/libwx_base_carbon_xml-2.8.a",
-					"/usr/local/lib/libwx_base_carbon_net-2.8.a",
-					"/usr/local/lib/libwx_base_carbon-2.8.a",
+					"/usr/local/lib/libwx_macu_richtext-2.8.a",
+					"/usr/local/lib/libwx_macu_aui-2.8.a",
+					"/usr/local/lib/libwx_macu_xrc-2.8.a",
+					"/usr/local/lib/libwx_macu_qa-2.8.a",
+					"/usr/local/lib/libwx_macu_html-2.8.a",
+					"/usr/local/lib/libwx_macu_adv-2.8.a",
+					"/usr/local/lib/libwx_macu_core-2.8.a",
+					"/usr/local/lib/libwx_base_carbonu_xml-2.8.a",
+					"/usr/local/lib/libwx_base_carbonu_net-2.8.a",
+					"/usr/local/lib/libwx_base_carbonu-2.8.a",
 					"-framework",
 					WebKit,
+					"-lwxregexu-2.8",
 					"-lwxexpat-2.8",
 					"-lwxtiff-2.8",
 					"-lwxjpeg-2.8",
@@ -259,7 +260,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = Atque;
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = YES;
+				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
@@ -284,7 +285,7 @@
 				INFOPLIST_FILE = "Atque-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_CFLAGS = (
-					"-I/usr/local/lib/wx/include/mac-ansi-release-static-2.8",
+					"-I/usr/local/lib/wx/include/mac-unicode-release-static-2.8",
 					"-I/usr/local/include/wx-2.8",
 					"-D_FILE_OFFSET_BITS=64",
 					"-D_LARGE_FILES",
@@ -304,18 +305,19 @@
 					System,
 					"-framework",
 					QuickTime,
-					"/usr/local/lib/libwx_mac_richtext-2.8.a",
-					"/usr/local/lib/libwx_mac_aui-2.8.a",
-					"/usr/local/lib/libwx_mac_xrc-2.8.a",
-					"/usr/local/lib/libwx_mac_qa-2.8.a",
-					"/usr/local/lib/libwx_mac_html-2.8.a",
-					"/usr/local/lib/libwx_mac_adv-2.8.a",
-					"/usr/local/lib/libwx_mac_core-2.8.a",
-					"/usr/local/lib/libwx_base_carbon_xml-2.8.a",
-					"/usr/local/lib/libwx_base_carbon_net-2.8.a",
-					"/usr/local/lib/libwx_base_carbon-2.8.a",
+					"/usr/local/lib/libwx_macu_richtext-2.8.a",
+					"/usr/local/lib/libwx_macu_aui-2.8.a",
+					"/usr/local/lib/libwx_macu_xrc-2.8.a",
+					"/usr/local/lib/libwx_macu_qa-2.8.a",
+					"/usr/local/lib/libwx_macu_html-2.8.a",
+					"/usr/local/lib/libwx_macu_adv-2.8.a",
+					"/usr/local/lib/libwx_macu_core-2.8.a",
+					"/usr/local/lib/libwx_base_carbonu_xml-2.8.a",
+					"/usr/local/lib/libwx_base_carbonu_net-2.8.a",
+					"/usr/local/lib/libwx_base_carbonu-2.8.a",
 					"-framework",
 					WebKit,
+					"-lwxregexu-2.8",
 					"-lwxexpat-2.8",
 					"-lwxtiff-2.8",
 					"-lwxjpeg-2.8",
