@@ -130,7 +130,7 @@ void AtqueWindow::Split(const wxString& file)
 						 false);
 	try
 	{
-		atque::split(std::string(file.mb_str()), std::string(filename.mb_str()), log);
+		atque::split(std::string(file.mb_str(wxConvUTF8)), std::string(filename.mb_str(wxConvUTF8)), log);
 		
 		log.seekg(0);
 		std::string line;
@@ -174,7 +174,7 @@ void AtqueWindow::Merge(const wxString& folder)
 						     false);
 	try
 	{
-		atque::merge(std::string(folder.mb_str()), std::string(filename.mb_str()), log);
+		atque::merge(std::string(folder.mb_str(wxConvUTF8)), std::string(filename.mb_str(wxConvUTF8)), log);
 		
 		log.seekg(0);
 		std::string line;
