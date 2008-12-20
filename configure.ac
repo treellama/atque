@@ -1,4 +1,4 @@
-AC_INIT(atque, 1.0, [http://sourceforge.net/tracker/?func=add&group_id=235817&atid=1097912] )
+AC_INIT(atque, 1.1, [http://sourceforge.net/tracker/?func=add&group_id=235817&atid=1097912] )
 
 AC_PREREQ([2.59])
 AC_CONFIG_AUX_DIR(config)
