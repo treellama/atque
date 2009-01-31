@@ -238,6 +238,23 @@ static std::string sanitize(const std::string& input)
 		}
 	}
 
+#ifdef __WIN32__
+	// strings can't end with space or dot!?
+	std::string::size_type pos = result.find_last_not_of(" .");
+	if (pos != std::string::npos)
+	{
+		result.erase(pos + 1);
+	}
+	else
+	{
+		result = "";
+	}
+#endif
+	if (result == "")
+	{
+		result = "Unnamed Level";
+	}
+
 	return result;
 }
 
