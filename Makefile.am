@@ -28,7 +28,7 @@ if BUILD_ATQUEGUI
 ATQUE_SOURCES=atque.h atque.cpp split.cpp split.h merge.cpp merge.h filesystem.h $(RESOURCE_SRCS)
 if MAKE_WINDOWS
 atque-resources.o:
-	@WX_RESCOMP@ -o atque-resources.o atque.rc
+	@WX_RESCOMP@ -o atque-resources.o -I$(srcdir) $(srcdir)/atque.rc
 Atque_LDADD=atque-resources.o
 Atque_SOURCES=$(ATQUE_SOURCES)
 else
