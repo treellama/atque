@@ -169,6 +169,11 @@ marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 	std::vector<fs::path> dir = path.ls();	
 	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
 	{
+		if (it->filename()[0] == '.')
+		{
+			continue;
+		}
+
 		std::string extension = fs::extension(it->filename());
 		if (extension == ".sceA")
 			maps.push_back(*it);
