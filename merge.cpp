@@ -231,6 +231,10 @@ marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 			}
 		}
 	}
+	else
+	{
+		throw merge_error(path.string() + " does not contain a map");
+	}
 	
 	return wad;
 }
