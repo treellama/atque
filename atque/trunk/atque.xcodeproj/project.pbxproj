@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		AE16C0230E760F4800710B6E /* atque.icns in Resources */ = {isa = PBXBuildFile; fileRef = AE16C0220E760F4800710B6E /* atque.icns */; };
-		AE16C02A0E760FB800710B6E /* libsndfile.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = AE175F4E0E74BAE1005BE1E9 /* libsndfile.framework */; };
 		AE175F470E74BAAA005BE1E9 /* atque.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F360E74BAAA005BE1E9 /* atque.cpp */; };
 		AE175F480E74BAAA005BE1E9 /* CLUTResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F380E74BAAA005BE1E9 /* CLUTResource.cpp */; };
 		AE175F490E74BAAA005BE1E9 /* EasyBMP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F3A0E74BAAA005BE1E9 /* EasyBMP.cpp */; };
@@ -16,7 +15,8 @@
 		AE175F4B0E74BAAA005BE1E9 /* PICTResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F410E74BAAA005BE1E9 /* PICTResource.cpp */; };
 		AE175F4C0E74BAAA005BE1E9 /* SndResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F430E74BAAA005BE1E9 /* SndResource.cpp */; };
 		AE175F4D0E74BAAA005BE1E9 /* split.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F450E74BAAA005BE1E9 /* split.cpp */; };
-		AE175F4F0E74BAE1005BE1E9 /* libsndfile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE175F4E0E74BAE1005BE1E9 /* libsndfile.framework */; };
+		AE699B5D1400B05800B6F18B /* sndfile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE699B5C1400B05800B6F18B /* sndfile.framework */; };
+		AE699B631400B09C00B6F18B /* sndfile.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = AE699B5C1400B05800B6F18B /* sndfile.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,7 +26,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				AE16C02A0E760FB800710B6E /* libsndfile.framework in CopyFiles */,
+				AE699B631400B09C00B6F18B /* sndfile.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -35,7 +35,7 @@
 /* Begin PBXFileReference section */
 		AE16C0220E760F4800710B6E /* atque.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = atque.icns; sourceTree = "<group>"; };
 		AE175F2E0E74BA63005BE1E9 /* Atque.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Atque.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AE175F310E74BA63005BE1E9 /* Atque-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Atque-Info.plist"; sourceTree = "<group>"; };
+		AE175F310E74BA63005BE1E9 /* Atque-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Atque-Info.plist"; sourceTree = "<group>"; };
 		AE175F360E74BAAA005BE1E9 /* atque.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = atque.cpp; sourceTree = "<group>"; };
 		AE175F370E74BAAA005BE1E9 /* atque.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = atque.h; sourceTree = "<group>"; };
 		AE175F380E74BAAA005BE1E9 /* CLUTResource.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = CLUTResource.cpp; sourceTree = "<group>"; };
@@ -53,7 +53,7 @@
 		AE175F440E74BAAA005BE1E9 /* SndResource.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SndResource.h; sourceTree = "<group>"; };
 		AE175F450E74BAAA005BE1E9 /* split.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = split.cpp; sourceTree = "<group>"; };
 		AE175F460E74BAAA005BE1E9 /* split.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = split.h; sourceTree = "<group>"; };
-		AE175F4E0E74BAE1005BE1E9 /* libsndfile.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libsndfile.framework; path = /Library/Frameworks/libsndfile.framework; sourceTree = "<absolute>"; };
+		AE699B5C1400B05800B6F18B /* sndfile.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = sndfile.framework; path = /Library/Frameworks/sndfile.framework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,7 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AE175F4F0E74BAE1005BE1E9 /* libsndfile.framework in Frameworks */,
+				AE699B5D1400B05800B6F18B /* sndfile.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,7 +72,7 @@
 			isa = PBXGroup;
 			children = (
 				AE16C0220E760F4800710B6E /* atque.icns */,
-				AE175F4E0E74BAE1005BE1E9 /* libsndfile.framework */,
+				AE699B5C1400B05800B6F18B /* sndfile.framework */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -138,10 +138,19 @@
 		AE175F1F0E74BA52005BE1E9 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = AE175F200E74BA52005BE1E9 /* Build configuration list for PBXProject "atque" */;
+			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
 			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
 			mainGroup = AE175F1D0E74BA52005BE1E9;
 			productRefGroup = AE175F2F0E74BA63005BE1E9 /* Products */;
 			projectDirPath = "";
+			projectRoot = "";
 			targets = (
 				AE175F2D0E74BA63005BE1E9 /* Atque */,
 			);
@@ -197,8 +206,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
-					i386,
 					ppc,
+					i386,
 				);
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -208,13 +217,15 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				GCC_VERSION = 4.0;
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
-					"$(HOME)/Library/Frameworks/libsndfile.framework/Headers",
-					/Library/Frameworks/libsndfile.framework/Headers,
+					"$(HOME)/Library/Frameworks/sndfile.framework/Headers",
+					/Library/Frameworks/sndfile.framework/Headers,
 				);
 				INFOPLIST_FILE = "Atque-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-I/usr/local/lib/wx/include/mac-unicode-release-static-2.8",
 					"-I/usr/local/include/wx-2.8",
@@ -236,6 +247,10 @@
 					System,
 					"-framework",
 					QuickTime,
+					"-framework",
+					OpenGL,
+					"-framework",
+					AGL,
 					"/usr/local/lib/libwx_macu_richtext-2.8.a",
 					"/usr/local/lib/libwx_macu_aui-2.8.a",
 					"/usr/local/lib/libwx_macu_xrc-2.8.a",
@@ -268,8 +283,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
-					i386,
 					ppc,
+					i386,
 				);
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -277,10 +292,11 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				GCC_VERSION = 4.0;
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
-					"$(HOME)/Library/Frameworks/libsndfile.framework/Headers",
-					/Library/Frameworks/libsndfile.framework/Headers,
+					"$(HOME)/Library/Frameworks/sndfile.framework/Headers",
+					/Library/Frameworks/sndfile.framework/Headers,
 				);
 				INFOPLIST_FILE = "Atque-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
@@ -305,6 +321,10 @@
 					System,
 					"-framework",
 					QuickTime,
+					"-framework",
+					OpenGL,
+					"-framework",
+					AGL,
 					"/usr/local/lib/libwx_macu_richtext-2.8.a",
 					"/usr/local/lib/libwx_macu_aui-2.8.a",
 					"/usr/local/lib/libwx_macu_xrc-2.8.a",
