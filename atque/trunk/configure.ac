@@ -10,7 +10,6 @@ AC_ARG_ENABLE(gui, [ --enable-gui	build atque GUI [default=yes]], , enable_gui=y
 
 AC_LANG(C++)
 
-
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
@@ -18,9 +17,7 @@ AC_PROG_CXXCPP
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 
-echo TARGET: $target
-
-case $target in
+case "$host" in
 *-mingw32*)
 	AC_CHECK_TOOL(WINDRES, windres, :)
 	make_windows=true
