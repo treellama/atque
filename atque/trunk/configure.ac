@@ -1,4 +1,4 @@
-AC_INIT(atque, 1.1.1, [http://sourceforge.net/tracker/?func=add&group_id=235817&atid=1097912] )
+AC_INIT(atque, 1.1.2, [http://sourceforge.net/tracker/?func=add&group_id=235817&atid=1097912] )
 
 AC_PREREQ([2.59])
 AC_CONFIG_AUX_DIR(config)
@@ -28,10 +28,6 @@ case "$host" in
 	;;
 esac
 
-dnl Check for ferro!
-AC_CHECK_HEADERS(ferro/Wadfile.h, , AC_ERROR([You must first install ferro]))
-AC_CHECK_LIB(ferro, main, LIBS="-lferro $LIBS", AC_ERROR([You must first install ferro]))
-
 AC_CHECK_HEADERS([sndfile.h], , AC_ERROR([Atque requires libsndfile]))
 AC_CHECK_LIB(sndfile, sf_open, LIBS="-lsndfile $LIBS", AC_ERROR([Atque requires libsndfile]))
 
@@ -55,7 +51,7 @@ AM_CONDITIONAL(BUILD_ATQUEGUI, [test "$wxWin" = 1 ])
 
 AM_CONDITIONAL(MAKE_WINDOWS, test x$make_windows = xtrue)
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile ferro/Makefile])
 AC_OUTPUT
 
 echo "Configuration done. Now type \"make\"."
