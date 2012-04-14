@@ -9,7 +9,6 @@ project page: http://sourceforge.net/projects/igniferroque
 To build Atque from source, you will need the following prerequisites:
 
 GNU autoconf and automake
-ferro http://sourceforge.net/projects/igniferroque
 libsndfile http://www.mega-nerd.com/libsndfile/
 Boost 1.33 or higher http://www.boost.org
 (optional) wxWidgets 2.8 http://www.wxwidgets.org/
