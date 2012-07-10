@@ -152,8 +152,12 @@ bool Unimap::Load(const std::string& path)
 #endif
 		
 		data_fork_ = 0;
-		stream_.seekg(0, std::ios::end);
-		data_length_ = stream_.tellg();
+		data_length_ = 0;
+		if (stream_.seekg(0, std::ios::end))
+		{
+			data_length_ = stream_.tellg();
+		}
+
 		if (data_length_)
 			return Wadfile::Load(path);
 		else
