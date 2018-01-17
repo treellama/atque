@@ -37,9 +37,9 @@ namespace marathon
 {
 	class crc_ostream;
 
-	class Wadfile 
+        class Wadfile 
 	{
-		friend std::ostream& operator<<(std::ostream&, const Wadfile&);
+            friend std::ostream& operator<<(std::ostream&, const Wadfile&);
 	public:
 		Wadfile() { stream_.exceptions(std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit);  }
 
@@ -169,6 +169,9 @@ namespace marathon
 		std::ostream& stream_;
 		boost::crc_32_type crc_;
 	};
+
+std::ostream& operator<<(std::ostream& s, const Wadfile& w);
+std::ostream& operator<<(std::ostream& s, const Wadfile::DirectoryEntry& entry);
 
 };
 

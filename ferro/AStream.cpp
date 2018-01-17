@@ -29,7 +29,6 @@
 using namespace std;
 
 AIStream& AIStream::operator>>(uint8 &value)
-	throw(AStream::failure)
 {
 	if(bound_check(1))
 	{
@@ -39,7 +38,6 @@ AIStream& AIStream::operator>>(uint8 &value)
 }
 
 AIStream& AIStream::operator>>(int8 &value)
-	throw(AStream::failure)
 {
 	uint8 UValue;
 	operator>>(UValue);
@@ -49,7 +47,6 @@ AIStream& AIStream::operator>>(int8 &value)
 }
 
 AIStream& AIStream::read(char *ptr, uint32 count)
-	throw(AStream::failure)
 {
 	if(bound_check(count))
 	{
@@ -60,7 +57,6 @@ AIStream& AIStream::read(char *ptr, uint32 count)
 }
 
 AIStream& AIStream::ignore(uint32 count)
-	throw(AStream::failure)
 {
 	if(bound_check(count))
 	{
@@ -70,7 +66,6 @@ AIStream& AIStream::ignore(uint32 count)
 }
 
 AOStream& AOStream::operator<<(uint8 value)
-	throw(AStream::failure)
 {
 	if(bound_check(1))
 	{
@@ -80,13 +75,11 @@ AOStream& AOStream::operator<<(uint8 value)
 }
 
 AOStream& AOStream::operator<<(int8 value)
-	throw(AStream::failure)
 {
 	return operator<<(uint8(value));
 }
 
 AOStream& AOStream::write(const char *ptr, uint32 count)
-	throw(AStream::failure)
 {
 	if(bound_check(count))
 	{
@@ -97,7 +90,6 @@ AOStream& AOStream::write(const char *ptr, uint32 count)
 }
 
 AOStream& AOStream::ignore(uint32 count)
-	throw(AStream::failure)
 {
 	if(bound_check(count))
 	{
@@ -109,7 +101,6 @@ AOStream& AOStream::ignore(uint32 count)
 //big endian
 
 AIStream& AIStreamBE::operator>>(uint16 &value)
-	throw(AStream::failure)
 {
 	if(bound_check(2))
 	{
@@ -123,7 +114,6 @@ AIStream& AIStreamBE::operator>>(uint16 &value)
 }
 
 AIStream& AIStreamBE::operator>>(int16 &value)
-	throw(AStream::failure)
 {
 	uint16 UValue;
 	operator>>(UValue);
@@ -133,7 +123,6 @@ AIStream& AIStreamBE::operator>>(int16 &value)
 }
 
 AIStream& AIStreamBE::operator>>(uint32 &value)
-	throw(AStream::failure)
 {
 	if(bound_check(4))
 	{
@@ -149,7 +138,6 @@ AIStream& AIStreamBE::operator>>(uint32 &value)
 }
 
 AIStream& AIStreamBE::operator>>(int32 &value)
-	throw(AStream::failure)
 {
 	uint32 UValue;
 	operator>>(UValue);
@@ -159,7 +147,6 @@ AIStream& AIStreamBE::operator>>(int32 &value)
 }
 
 AOStream& AOStreamBE::operator<<(uint16 value)
-	throw(AStream::failure)
 {
 	if(bound_check(2))
 	{
@@ -170,13 +157,11 @@ AOStream& AOStreamBE::operator<<(uint16 value)
 }
 
 AOStream& AOStreamBE::operator<<(int16 value)
-	throw(AStream::failure)
 {
 	return operator<<(uint16(value));
 }
 
 AOStream& AOStreamBE::operator<<(uint32 value)
-	throw(AStream::failure)
 {
 	if(bound_check(4))
 	{
@@ -189,7 +174,6 @@ AOStream& AOStreamBE::operator<<(uint32 value)
 }
 
 AOStream& AOStreamBE::operator<<(int32 value)
-	throw(AStream::failure)
 {
 	return operator<<(uint32(value));
 }
@@ -198,7 +182,6 @@ AOStream& AOStreamBE::operator<<(int32 value)
 // little endian
 
 AIStream& AIStreamLE::operator>>(uint16 &value)
-	throw(AStream::failure)
 {
 	if(bound_check(2))
 	{
@@ -212,7 +195,6 @@ AIStream& AIStreamLE::operator>>(uint16 &value)
 }
 
 AIStream& AIStreamLE::operator>>(int16 &value)
-	throw(AStream::failure)
 {
 	uint16 UValue;
 	operator>>(UValue);
@@ -222,7 +204,6 @@ AIStream& AIStreamLE::operator>>(int16 &value)
 }
 
 AIStream& AIStreamLE::operator>>(uint32 &value)
-	throw(AStream::failure)
 {
 	if(bound_check(4))
 	{
@@ -238,7 +219,6 @@ AIStream& AIStreamLE::operator>>(uint32 &value)
 }
 
 AIStream& AIStreamLE::operator>>(int32 &value)
-	throw(AStream::failure)
 {
 	uint32 UValue;
 	operator>>(UValue);
@@ -248,7 +228,6 @@ AIStream& AIStreamLE::operator>>(int32 &value)
 }
 
 AOStream& AOStreamLE::operator<<(uint16 value)
-	throw(AStream::failure)
 {
 	if(bound_check(2))
 	{
@@ -259,13 +238,11 @@ AOStream& AOStreamLE::operator<<(uint16 value)
 }
 
 AOStream& AOStreamLE::operator<<(int16 value)
-	throw(AStream::failure)
 {
 	return operator<<(uint16(value));
 }
 
 AOStream& AOStreamLE::operator<<(uint32 value)
-	throw(AStream::failure)
 {
 	if(bound_check(4))
 	{
@@ -278,14 +255,12 @@ AOStream& AOStreamLE::operator<<(uint32 value)
 }
 
 AOStream& AOStreamLE::operator<<(int32 value)
-	throw(AStream::failure)
 {
 	return operator<<(uint32(value));
 }
 
 template<typename T>
 bool AStream::basic_astream<T>::bound_check(uint32 delta)
-	throw(AStream::failure)
 {
 	if(_M_stream_pos + delta > _M_stream_end)
 	{

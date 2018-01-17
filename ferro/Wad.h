@@ -76,6 +76,8 @@ namespace marathon
 			void Save(AOStream& stream);
 		};
 	};
+
+std::ostream& operator<<(std::ostream& s, const Wad& w);
 }
 
 #endif

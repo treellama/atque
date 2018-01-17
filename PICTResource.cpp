@@ -352,7 +352,7 @@ void PICTResource::LoadCopyBits(AIStreamBE& stream, bool packed, bool clipped)
 			else
 				index &= 0xff;
 
-			RGBApixel pixel = { blue >> 8, green >> 8, red >> 8, 0xff };
+			RGBApixel pixel = { static_cast<ebmpBYTE>(blue >> 8), static_cast<ebmpBYTE>(green >> 8), static_cast<ebmpBYTE>(red >> 8), 0xff };
 			bitmap_.SetColor(index, pixel);
 		}
 	}
@@ -630,7 +630,7 @@ bool PICTResource::LoadRaw(const std::vector<uint8>& data, const std::vector<uin
 				    >> green
 				    >> blue;
 
-			RGBApixel color = { blue >> 8, green >> 8, red >> 8, 0xff };
+			RGBApixel color = { static_cast<ebmpBYTE>(blue >> 8), static_cast<ebmpBYTE>(green >> 8), static_cast<ebmpBYTE>(red >> 8), 0xff };
 			bitmap_.SetColor(i, color);
 		}
 		for (int y = 0; y < height; ++y)
