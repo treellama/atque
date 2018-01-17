@@ -84,7 +84,7 @@ void AtqueWindow::OnSplit(wxCommandEvent &event)
 						    Directory,
 						    wxT(""),
 						    wxT("Scenario files|*.sceA;*.imgA|All files|*.*"),
-						    wxOPEN);
+						    wxFD_OPEN);
     if (openFileDialog->ShowModal() == wxID_OK)
     {
 	Split(openFileDialog->GetPath());
@@ -111,7 +111,7 @@ void AtqueWindow::Split(const wxString& file)
 						    Directory,
 						    wxT("Split Map Folder"),
 						    wxT(""),
-						    wxSAVE | wxOVERWRITE_PROMPT);
+						    wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     if (saveFileDialog->ShowModal() == wxID_OK)
     {
 	wxBusyCursor busy;
@@ -158,7 +158,7 @@ void AtqueWindow::Merge(const wxString& folder)
 						    wxT(""),
 						    wxT("Merged Map Files.sceA"),
 						    wxT(""),
-						    wxSAVE | wxOVERWRITE_PROMPT);
+						    wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     if (saveFileDialog->ShowModal() == wxID_OK)
     {
 	wxBusyCursor busy;
