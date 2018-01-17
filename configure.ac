@@ -35,7 +35,7 @@ AX_BOOST_BASE([1.33.1])
 
 if [[ "x$enable_gui" = "xyes" ]]; then
 AM_OPTIONS_WXCONFIG  
-reqwx=2.8.0
+reqwx=3.0.0
 AM_PATH_WXCONFIG($reqwx, wxWin=1)
 fi
 
