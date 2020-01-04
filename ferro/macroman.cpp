@@ -144,14 +144,14 @@ static void unicode_to_utf8(uint16 c, std::string& output)
 	}
 	else if (c < 0x800) 
 	{
-		output += (0xc0 | c >> 6);
-		output += (0x80 | c & 0x3f);
+		output += (0xc0 | (c >> 6));
+		output += (0x80 | (c & 0x3f));
 	}
 	else 
 	{
-		output += (0xe0 | c >> 12);
-		output += (0x80 | c >> 6 & 0x3f);
-		output += (0x80 | c & 0x3f);
+		output += (0xe0 | (c >> 12));
+		output += (0x80 | ((c >> 6) & 0x3f));
+		output += (0x80 | (c & 0x3f));
 	}
 }
 
