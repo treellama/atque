@@ -204,7 +204,7 @@ void AtqueWindow::do_layout()
     // begin wxGlade: AtqueWindow::do_layout
     wxBoxSizer* sizer_1 = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer* sizer_2 = new wxBoxSizer(wxVERTICAL);
-    sizer_2->Add(instructions, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5);
+    sizer_2->Add(instructions, 0, wxALL|wxEXPAND, 5);
     panel_1->SetSizer(sizer_2);
     sizer_1->Add(panel_1, 1, wxEXPAND, 0);
     SetSizer(sizer_1);
