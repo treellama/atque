@@ -371,7 +371,7 @@ void Wadfile::DirectoryData::Load(std::istream& stream)
 	s >> environment_flags;
 	s >> entry_point_flags;
 	s.read(level_name, MapInfo::kLevelNameLength);
-	level_name[MapInfo::kLevelNameLength] = '\0';
+	level_name[MapInfo::kLevelNameLength - 1] = '\0';
 }
 
 void Wadfile::DirectoryData::Save(crc_ostream& stream) const
