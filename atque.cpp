@@ -52,7 +52,7 @@ END_EVENT_TABLE();
 
 void AtqueWindow::OnAbout(wxCommandEvent &event)
 {
-    wxMessageBox(wxT("Atque 1.1.1 (C) 2008-2011 Gregory Smith\n\nAtque is licensed under the GNU GPL. See COPYING.txt"), wxT("About Atque"), wxOK);
+    wxMessageBox(wxT("Atque 1.1.3 (C) 2008-2020 Gregory Smith\n\nAtque is licensed under the GNU GPL. See COPYING.txt"), wxT("About Atque"), wxOK);
 }
 
 

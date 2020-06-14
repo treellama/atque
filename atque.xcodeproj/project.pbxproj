@@ -38,6 +38,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AE13A90723C1051D0038E387 /* Atque.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Atque.entitlements; sourceTree = "<group>"; };
 		AE16C0220E760F4800710B6E /* atque.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = atque.icns; sourceTree = "<group>"; };
 		AE175F2E0E74BA63005BE1E9 /* Atque.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Atque.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE175F310E74BA63005BE1E9 /* Atque-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Atque-Info.plist"; sourceTree = "<group>"; };
@@ -99,6 +100,7 @@
 		AE175F1D0E74BA52005BE1E9 = {
 			isa = PBXGroup;
 			children = (
+				AE13A90723C1051D0038E387 /* Atque.entitlements */,
 				AE789D681539FF0F0044022B /* ferro */,
 				AE175F360E74BAAA005BE1E9 /* atque.cpp */,
 				AE175F370E74BAAA005BE1E9 /* atque.h */,
@@ -266,32 +268,41 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_ENTITLEMENTS = Atque.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1.1.3;
+				DEVELOPMENT_TEAM = E8K89CXZE7;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
+					/opt/static/include,
 					$SRCROOT,
 				);
 				INFOPLIST_FILE = "Atque-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = /opt/static/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MARKETING_VERSION = 1.1.3;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
-					"-I/Users/ghs/Development/wxWidgets-3.1.3/lib/wx/include/osx_cocoa-unicode-static-3.1",
-					"-I/Users/ghs/Development/wxWidgets-3.1.3/include",
+					"-I/opt/static/lib/wx/include/osx_cocoa-unicode-static-3.1",
+					"-I/opt/static/include/wx-3.1",
 					"-D_FILE_OFFSET_BITS=64",
-					"-D_LARGE_FILES",
 					"-D__WXMAC__",
+					"-D__WXOSX__",
 					"-D__WXOSX_COCOA__",
+					"
+",
 				);
 				OTHER_LDFLAGS = (
-					"-L/Users/ghs/Development/wxWidgets-3.1.3/lib",
+					"-L/opt/static/lib",
 					"-framework",
 					IOKit,
 					"-framework",
@@ -304,13 +315,13 @@
 					System,
 					"-framework",
 					OpenGL,
-					"/Users/ghs/Development/wxWidgets-3.1.3/lib/libwx_osx_cocoau_xrc-3.1.a",
-					"/Users/ghs/Development/wxWidgets-3.1.3/lib/libwx_osx_cocoau_qa-3.1.a",
-					"/Users/ghs/Development/wxWidgets-3.1.3/lib/libwx_baseu_net-3.1.a",
-					"/Users/ghs/Development/wxWidgets-3.1.3/lib/libwx_osx_cocoau_html-3.1.a",
-					"/Users/ghs/Development/wxWidgets-3.1.3/lib/libwx_osx_cocoau_core-3.1.a",
-					"/Users/ghs/Development/wxWidgets-3.1.3/lib/libwx_baseu_xml-3.1.a",
-					"/Users/ghs/Development/wxWidgets-3.1.3/lib/libwx_baseu-3.1.a",
+					"/opt/static/lib/libwx_osx_cocoau_xrc-3.1.a",
+					"/opt/static/lib/libwx_osx_cocoau_qa-3.1.a",
+					"/opt/static/lib/libwx_baseu_net-3.1.a",
+					"/opt/static/lib/libwx_osx_cocoau_html-3.1.a",
+					"/opt/static/lib/libwx_osx_cocoau_core-3.1.a",
+					"/opt/static/lib/libwx_baseu_xml-3.1.a",
+					"/opt/static/lib/libwx_baseu-3.1.a",
 					"-framework",
 					WebKit,
 					"-lwxtiff-3.1",
@@ -324,15 +335,13 @@
 					Security,
 					"-lpthread",
 					"-liconv",
-					"-llzma",
-					"-L/usr/local/lib",
 					"-lsndfile",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.alephone.Atque;
 				PRODUCT_NAME = Atque;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
@@ -340,30 +349,39 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_ENTITLEMENTS = Atque.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = YES;
+				CURRENT_PROJECT_VERSION = 1.1.3;
+				DEVELOPMENT_TEAM = E8K89CXZE7;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
 				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
+					/opt/static/include,
 					$SRCROOT,
 				);
 				INFOPLIST_FILE = "Atque-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = /opt/static/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MARKETING_VERSION = 1.1.3;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
-					"-I/Users/ghs/Development/wxWidgets-3.1.3/lib/wx/include/osx_cocoa-unicode-static-3.1",
-					"-I/Users/ghs/Development/wxWidgets-3.1.3/include",
+					"-I/opt/static/lib/wx/include/osx_cocoa-unicode-static-3.1",
+					"-I/opt/static/include/wx-3.1",
 					"-D_FILE_OFFSET_BITS=64",
-					"-D_LARGE_FILES",
 					"-D__WXMAC__",
+					"-D__WXOSX__",
 					"-D__WXOSX_COCOA__",
+					"
+",
 				);
 				OTHER_LDFLAGS = (
-					"-L/Users/ghs/Development/wxWidgets-3.1.3/lib",
+					"-L/opt/static/lib",
 					"-framework",
 					IOKit,
 					"-framework",
@@ -376,13 +394,13 @@
 					System,
 					"-framework",
 					OpenGL,
-					"/Users/ghs/Development/wxWidgets-3.1.3/lib/libwx_osx_cocoau_xrc-3.1.a",
-					"/Users/ghs/Development/wxWidgets-3.1.3/lib/libwx_osx_cocoau_qa-3.1.a",
-					"/Users/ghs/Development/wxWidgets-3.1.3/lib/libwx_baseu_net-3.1.a",
-					"/Users/ghs/Development/wxWidgets-3.1.3/lib/libwx_osx_cocoau_html-3.1.a",
-					"/Users/ghs/Development/wxWidgets-3.1.3/lib/libwx_osx_cocoau_core-3.1.a",
-					"/Users/ghs/Development/wxWidgets-3.1.3/lib/libwx_baseu_xml-3.1.a",
-					"/Users/ghs/Development/wxWidgets-3.1.3/lib/libwx_baseu-3.1.a",
+					"/opt/static/lib/libwx_osx_cocoau_xrc-3.1.a",
+					"/opt/static/lib/libwx_osx_cocoau_qa-3.1.a",
+					"/opt/static/lib/libwx_baseu_net-3.1.a",
+					"/opt/static/lib/libwx_osx_cocoau_html-3.1.a",
+					"/opt/static/lib/libwx_osx_cocoau_core-3.1.a",
+					"/opt/static/lib/libwx_baseu_xml-3.1.a",
+					"/opt/static/lib/libwx_baseu-3.1.a",
 					"-framework",
 					WebKit,
 					"-lwxtiff-3.1",
@@ -396,15 +414,13 @@
 					Security,
 					"-lpthread",
 					"-liconv",
-					"-llzma",
-					"-L/usr/local/lib",
 					"-lsndfile",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.alephone.Atque;
 				PRODUCT_NAME = Atque;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
