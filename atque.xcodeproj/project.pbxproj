@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 45;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,8 +15,6 @@
 		AE175F4B0E74BAAA005BE1E9 /* PICTResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F410E74BAAA005BE1E9 /* PICTResource.cpp */; };
 		AE175F4C0E74BAAA005BE1E9 /* SndResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F430E74BAAA005BE1E9 /* SndResource.cpp */; };
 		AE175F4D0E74BAAA005BE1E9 /* split.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F450E74BAAA005BE1E9 /* split.cpp */; };
-		AE699B5D1400B05800B6F18B /* sndfile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE699B5C1400B05800B6F18B /* sndfile.framework */; };
-		AE699B631400B09C00B6F18B /* sndfile.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = AE699B5C1400B05800B6F18B /* sndfile.framework */; };
 		AE789D7A1539FF320044022B /* AStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE789D691539FF320044022B /* AStream.cpp */; };
 		AE789D7B1539FF320044022B /* macroman.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE789D6C1539FF320044022B /* macroman.cpp */; };
 		AE789D7C1539FF320044022B /* MapInfoChunk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE789D6E1539FF320044022B /* MapInfoChunk.cpp */; };
@@ -34,13 +32,13 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				AE699B631400B09C00B6F18B /* sndfile.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AE13A90723C1051D0038E387 /* Atque.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Atque.entitlements; sourceTree = "<group>"; };
 		AE16C0220E760F4800710B6E /* atque.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = atque.icns; sourceTree = "<group>"; };
 		AE175F2E0E74BA63005BE1E9 /* Atque.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Atque.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE175F310E74BA63005BE1E9 /* Atque-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Atque-Info.plist"; sourceTree = "<group>"; };
@@ -61,7 +59,6 @@
 		AE175F440E74BAAA005BE1E9 /* SndResource.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SndResource.h; sourceTree = "<group>"; };
 		AE175F450E74BAAA005BE1E9 /* split.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = split.cpp; sourceTree = "<group>"; };
 		AE175F460E74BAAA005BE1E9 /* split.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = split.h; sourceTree = "<group>"; };
-		AE699B5C1400B05800B6F18B /* sndfile.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = sndfile.framework; path = /Library/Frameworks/sndfile.framework; sourceTree = "<absolute>"; };
 		AE789D691539FF320044022B /* AStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AStream.cpp; path = ferro/AStream.cpp; sourceTree = "<group>"; };
 		AE789D6A1539FF320044022B /* AStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AStream.h; path = ferro/AStream.h; sourceTree = "<group>"; };
 		AE789D6B1539FF320044022B /* cstypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cstypes.h; path = ferro/cstypes.h; sourceTree = "<group>"; };
@@ -86,7 +83,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AE699B5D1400B05800B6F18B /* sndfile.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,7 +93,6 @@
 			isa = PBXGroup;
 			children = (
 				AE16C0220E760F4800710B6E /* atque.icns */,
-				AE699B5C1400B05800B6F18B /* sndfile.framework */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -105,6 +100,7 @@
 		AE175F1D0E74BA52005BE1E9 = {
 			isa = PBXGroup;
 			children = (
+				AE13A90723C1051D0038E387 /* Atque.entitlements */,
 				AE789D681539FF0F0044022B /* ferro */,
 				AE175F360E74BAAA005BE1E9 /* atque.cpp */,
 				AE175F370E74BAAA005BE1E9 /* atque.h */,
@@ -187,15 +183,19 @@
 /* Begin PBXProject section */
 		AE175F1F0E74BA52005BE1E9 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1130;
+			};
 			buildConfigurationList = AE175F200E74BA52005BE1E9 /* Build configuration list for PBXProject "atque" */;
 			compatibilityVersion = "Xcode 2.4";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
-				Japanese,
-				French,
-				German,
+				de,
+				fr,
+				en,
+				ja,
+				Base,
 			);
 			mainGroup = AE175F1D0E74BA52005BE1E9;
 			productRefGroup = AE175F2F0E74BA63005BE1E9 /* Products */;
@@ -247,61 +247,62 @@
 		AE175F210E74BA52005BE1E9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_VERSION = 4.0;
+				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;
 		};
 		AE175F220E74BA52005BE1E9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					i386,
-					ppc,
-				);
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				COPY_PHASE_STRIP = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 			};
 			name = Release;
 		};
 		AE175F330E74BA64005BE1E9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = Atque.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1.1.3;
+				DEVELOPMENT_TEAM = E8K89CXZE7;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
-				GCC_VERSION = 4.0;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
-					"$(HOME)/Library/Frameworks/sndfile.framework/Headers",
-					/Library/Frameworks/sndfile.framework/Headers,
+					/opt/static/include,
+					$SRCROOT,
 				);
 				INFOPLIST_FILE = "Atque-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = /opt/static/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MARKETING_VERSION = 1.1.3;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
-					"-I/usr/local/lib/wx/include/mac-unicode-release-static-2.8",
-					"-I/usr/local/include/wx-2.8",
+					"-I/opt/static/lib/wx/include/osx_cocoa-unicode-static-3.1",
+					"-I/opt/static/include/wx-3.1",
 					"-D_FILE_OFFSET_BITS=64",
-					"-D_LARGE_FILES",
 					"-D__WXMAC__",
+					"-D__WXOSX__",
+					"-D__WXOSX_COCOA__",
+					"
+",
 				);
 				OTHER_LDFLAGS = (
-					"-lm",
-					"-L/usr/local/lib",
-					"-arch",
-					ppc,
-					"-arch",
-					i386,
+					"-L/opt/static/lib",
 					"-framework",
 					IOKit,
 					"-framework",
@@ -309,72 +310,78 @@
 					"-framework",
 					Cocoa,
 					"-framework",
+					AudioToolbox,
+					"-framework",
 					System,
 					"-framework",
-					QuickTime,
-					"-framework",
 					OpenGL,
-					"-framework",
-					AGL,
-					"/usr/local/lib/libwx_macu_richtext-2.8.a",
-					"/usr/local/lib/libwx_macu_aui-2.8.a",
-					"/usr/local/lib/libwx_macu_xrc-2.8.a",
-					"/usr/local/lib/libwx_macu_qa-2.8.a",
-					"/usr/local/lib/libwx_macu_html-2.8.a",
-					"/usr/local/lib/libwx_macu_adv-2.8.a",
-					"/usr/local/lib/libwx_macu_core-2.8.a",
-					"/usr/local/lib/libwx_base_carbonu_xml-2.8.a",
-					"/usr/local/lib/libwx_base_carbonu_net-2.8.a",
-					"/usr/local/lib/libwx_base_carbonu-2.8.a",
+					"/opt/static/lib/libwx_osx_cocoau_xrc-3.1.a",
+					"/opt/static/lib/libwx_osx_cocoau_qa-3.1.a",
+					"/opt/static/lib/libwx_baseu_net-3.1.a",
+					"/opt/static/lib/libwx_osx_cocoau_html-3.1.a",
+					"/opt/static/lib/libwx_osx_cocoau_core-3.1.a",
+					"/opt/static/lib/libwx_baseu_xml-3.1.a",
+					"/opt/static/lib/libwx_baseu-3.1.a",
 					"-framework",
 					WebKit,
-					"-lwxregexu-2.8",
-					"-lwxexpat-2.8",
-					"-lwxtiff-2.8",
-					"-lwxjpeg-2.8",
-					"-lwxpng-2.8",
+					"-lwxtiff-3.1",
+					"-lwxjpeg-3.1",
+					"-lwxpng-3.1",
+					"-lwxregexu-3.1",
+					"-lwxscintilla-3.1",
+					"-lexpat",
 					"-lz",
+					"-framework",
+					Security,
 					"-lpthread",
 					"-liconv",
+					"-lsndfile",
 				);
-				PREBINDING = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alephone.Atque;
 				PRODUCT_NAME = Atque;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
 		AE175F340E74BA64005BE1E9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					i386,
-					ppc,
-				);
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = Atque.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				CURRENT_PROJECT_VERSION = 1.1.3;
+				DEVELOPMENT_TEAM = E8K89CXZE7;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
-				GCC_VERSION = 4.0;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
-					"$(HOME)/Library/Frameworks/sndfile.framework/Headers",
-					/Library/Frameworks/sndfile.framework/Headers,
+					/opt/static/include,
+					$SRCROOT,
 				);
 				INFOPLIST_FILE = "Atque-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = /opt/static/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MARKETING_VERSION = 1.1.3;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
-					"-I/usr/local/lib/wx/include/mac-unicode-release-static-2.8",
-					"-I/usr/local/include/wx-2.8",
+					"-I/opt/static/lib/wx/include/osx_cocoa-unicode-static-3.1",
+					"-I/opt/static/include/wx-3.1",
 					"-D_FILE_OFFSET_BITS=64",
-					"-D_LARGE_FILES",
 					"-D__WXMAC__",
+					"-D__WXOSX__",
+					"-D__WXOSX_COCOA__",
+					"
+",
 				);
 				OTHER_LDFLAGS = (
-					"-lm",
-					"-L/usr/local/lib",
+					"-L/opt/static/lib",
 					"-framework",
 					IOKit,
 					"-framework",
@@ -382,38 +389,38 @@
 					"-framework",
 					Cocoa,
 					"-framework",
+					AudioToolbox,
+					"-framework",
 					System,
 					"-framework",
-					QuickTime,
-					"-framework",
 					OpenGL,
-					"-framework",
-					AGL,
-					"/usr/local/lib/libwx_macu_richtext-2.8.a",
-					"/usr/local/lib/libwx_macu_aui-2.8.a",
-					"/usr/local/lib/libwx_macu_xrc-2.8.a",
-					"/usr/local/lib/libwx_macu_qa-2.8.a",
-					"/usr/local/lib/libwx_macu_html-2.8.a",
-					"/usr/local/lib/libwx_macu_adv-2.8.a",
-					"/usr/local/lib/libwx_macu_core-2.8.a",
-					"/usr/local/lib/libwx_base_carbonu_xml-2.8.a",
-					"/usr/local/lib/libwx_base_carbonu_net-2.8.a",
-					"/usr/local/lib/libwx_base_carbonu-2.8.a",
+					"/opt/static/lib/libwx_osx_cocoau_xrc-3.1.a",
+					"/opt/static/lib/libwx_osx_cocoau_qa-3.1.a",
+					"/opt/static/lib/libwx_baseu_net-3.1.a",
+					"/opt/static/lib/libwx_osx_cocoau_html-3.1.a",
+					"/opt/static/lib/libwx_osx_cocoau_core-3.1.a",
+					"/opt/static/lib/libwx_baseu_xml-3.1.a",
+					"/opt/static/lib/libwx_baseu-3.1.a",
 					"-framework",
 					WebKit,
-					"-lwxregexu-2.8",
-					"-lwxexpat-2.8",
-					"-lwxtiff-2.8",
-					"-lwxjpeg-2.8",
-					"-lwxpng-2.8",
+					"-lwxtiff-3.1",
+					"-lwxjpeg-3.1",
+					"-lwxpng-3.1",
+					"-lwxregexu-3.1",
+					"-lwxscintilla-3.1",
+					"-lexpat",
 					"-lz",
+					"-framework",
+					Security,
 					"-lpthread",
 					"-liconv",
+					"-lsndfile",
 				);
-				PREBINDING = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.alephone.Atque;
 				PRODUCT_NAME = Atque;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
