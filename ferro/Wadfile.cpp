@@ -403,4 +403,6 @@ std::ostream& marathon::operator<<(std::ostream& s, const Wadfile& w)
 std::ostream& marathon::operator<<(std::ostream& s, const Wadfile::DirectoryEntry& entry)
 {
 	s << "Entry index: " << entry.index <<"\tsize: " << entry.size << "\toffset: " << entry.offset << std::endl;
+
+        return s;
 }
