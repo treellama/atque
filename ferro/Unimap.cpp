@@ -250,7 +250,8 @@ bool ResourceMap::Load(AIStreamBE& stream)
 			}
 		}
 	}
-	
+
+        return true;
 }
 
 void Unimap::LoadResourceFork(std::istream& stream, std::streamsize size)

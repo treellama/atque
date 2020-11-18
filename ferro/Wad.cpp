@@ -198,5 +198,7 @@ std::ostream& marathon::operator<<(std::ostream& s, const Wad& w)
 	{
 		s << std::string(reinterpret_cast<const char*>(&it->first), 4) << std::endl;
 	}
+        
+        return s;
 }
 
