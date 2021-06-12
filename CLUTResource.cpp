@@ -114,9 +114,9 @@ bool CLUTResource::Import(const std::string& path)
 			
 			stream >> red >> green >> blue;
 			
-			colors_[i].red = red << 8;
-			colors_[i].green = green << 8;
-			colors_[i].blue = blue << 8;
+			colors_[i].red = (red << 8) | red;
+			colors_[i].green = (green << 8) | green;
+			colors_[i].blue = (blue << 8) | blue;
 		}
 		
 		if (size >= 3 * 256 + 4)
@@ -138,9 +138,9 @@ bool CLUTResource::Import(const std::string& path)
 			for (int i = 0; i < bitmap.TellNumberOfColors(); ++i)
 			{
 				RGBApixel color = bitmap.GetColor(i);
-				colors_[i].red = color.Red << 8;
-				colors_[i].green = color.Green << 8;
-				colors_[i].blue = color.Blue << 8;
+				colors_[i].red = (color.Red << 8) | color.Red;
+				colors_[i].green = (color.Green << 8) | color.Green;
+				colors_[i].blue = (color.Blue << 8) | color.Blue;
 			}
 
 			return true;
