@@ -98,6 +98,7 @@ bool CLUTResource::Import(const std::string& path)
 		std::ifstream infile(path.c_str(), std::ios::binary);
 		infile.seekg(0, std::ios::end);
 		uint32 size = infile.tellg();
+		infile.seekg(0, std::ios::beg);
 		if (size < 3 * 256)
 			return false;
 		
