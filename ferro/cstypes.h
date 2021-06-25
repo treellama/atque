@@ -21,19 +21,19 @@
 #ifndef CSTYPES_H
 #define CSTYPES_H
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 enum {
 	NONE = -1,
 	UNONE = 65536
 };
 
-typedef boost::uint8_t uint8;
-typedef boost::int8_t int8;
-typedef boost::uint16_t uint16;
-typedef boost::int16_t int16;
-typedef boost::uint32_t uint32;
-typedef boost::int32_t int32;
+typedef uint8_t uint8;
+typedef int8_t int8;
+typedef uint16_t uint16;
+typedef int16_t int16;
+typedef uint32_t uint32;
+typedef int32_t int32;
 
 #define FOUR_CHARS_TO_INT(a,b,c,d) (((uint32)(a) << 24) | ((uint32)(b) << 16) | ((uint32)(c) << 8) | (uint32)(d))
 
