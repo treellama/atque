@@ -25,6 +25,11 @@
 
 #include <boost/crc.hpp>
 
+#if defined(__APPLE__) && defined(__MACH__)
+#include <sstream>
+#include <sys/xattr.h>
+#endif
+
 using namespace marathon;
 
 const std::vector<uint8>& Unimap::GetResource(ResourceIdentifier id)
@@ -135,19 +140,17 @@ bool Unimap::Load(const std::string& path)
 	if (!LoadMacBinary())
 	{
 #if defined(__APPLE__) && defined(__MACH__)
-		// try to open the raw resource fork
-		try
+		auto size = getxattr(path.c_str(), "com.apple.ResourceFork", NULL, 0, 0, 0);
+		if (size >= 0)
 		{
-			std::string rsrc_path = path + "/..namedfork/rsrc";
-			std::ifstream rsrc_fork(rsrc_path.c_str(), std::ios::binary);
-			rsrc_fork.seekg(0, std::ios::end);
-			std::streamsize length = rsrc_fork.tellg();
-			rsrc_fork.seekg(0);
-			if (length) LoadResourceFork(rsrc_fork, length);
-		}
-		catch (const std::ios_base::failure& e)
-		{
-			resources_.clear();
+			// read the whole fork into memory(!) with getxattr
+			std::string s;
+			s.resize(size);
+			if (getxattr(path.c_str(), "com.apple.ResourceFork", &s[0], s.size(), 0, 0) != -1)
+			{
+				std::istringstream rsrc_fork(s);
+				LoadResourceFork(rsrc_fork, s.size());
+			}
 		}
 #endif
 		
