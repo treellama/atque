@@ -11,7 +11,7 @@ RESOURCE_SRCS=CLUTResource.h CLUTResource.cpp PICTResource.h PICTResource.cpp Sn
 
 EXTRA_DIST=atque.wxg atque.icns Atque-Info.plist EasyBMP_License.txt COPYING.txt atque.xcodeproj/project.pbxproj atque.rc atque.ico README.txt atque.png
 
-INCLUDES=-I$(top_srcdir)/ferro
+AM_CPPFLAGS=-I$(top_srcdir)/ferro
 
 if BUILD_ATQUEGUI
 if MAKE_WINDOWS
