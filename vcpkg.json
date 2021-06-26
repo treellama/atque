@@ -1,0 +1,23 @@
+{
+    "name":"atque",
+    "version-date":"2021-04-08",
+    "dependencies":[
+		{
+			"name":"boost-algorithm"
+		},
+		{
+			"name":"boost-assign"
+		},
+		{
+			"name":"boost-crc"
+		},
+        {
+            "name":"libsndfile",
+            "default-features": false
+        },
+        {
+            "name":"wxwidgets"
+        }
+    ],
+    "builtin-baseline":"08214e18eeb146542944067c35d77faca8962be5"
+}
