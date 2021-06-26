@@ -1,5 +1,6 @@
-AC_INIT(atque, 1.1.2, [http://sourceforge.net/tracker/?func=add&group_id=235817&atid=1097912] )
+AC_INIT(atque, 1.1.3, [https://github.com/treellama/atque/issues], atque, [https://github.com/treellama/atque] )
 
+AC_CONFIG_MACRO_DIR([m4])
 AC_PREREQ([2.59])
 AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE([foreign])
