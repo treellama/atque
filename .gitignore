@@ -17,3 +17,5 @@ m4/
 Makefile
 Makefile.in
 stamp-h1
+vcpkg/installed-arm64-osx
+vcpkg/installed-x64-osx
