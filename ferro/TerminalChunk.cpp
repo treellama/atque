@@ -217,23 +217,26 @@ static std::string get_line(std::istream& stream)
 	std::string line;
 	char c;
 	stream.get(c);
-	while (!stream.eof() && c != '\n' && c != '\r')
+	while (!stream.eof())
 	{
 		if (c == '\r')
 		{
-			if (!stream.eof() && stream.peek() == '\n')
+			if (stream.peek() != '\n')
 			{
-				stream.ignore(1);
+				break;
 			}
 		}
-		else if (c != '\n' && c != '\0')
+		else if (c == '\n')
+		{
+			break;
+		}
+		else if (c != '\0')
 		{
 			line += c;
 		}
 
 		stream.get(c);
-
-	};
+	}
 
 	return utf8_to_mac_roman(line);
 }
