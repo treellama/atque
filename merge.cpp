@@ -100,7 +100,7 @@ void MergeShapes(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 	std::ifstream shapes(path.string().c_str(), std::ios::in | std::ios::binary);
 	shapes.seekg(0, std::ios::end);
 	uint32 length = shapes.tellg();
-	if (length <= 384 * 1024)
+	if (length <= 4096 * 1024)
 	{
 		std::vector<uint8> shapes_buffer(length);
 		
@@ -111,7 +111,28 @@ void MergeShapes(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 	else
 	{
 		fs::path file = path.parent() / path.filename();
-		log << file.string() << " is larger than 384K; skipping" << std::endl;
+		log << file.string() << " is larger than 4 MB; skipping" << std::endl;
+	}
+}
+
+void MergeSounds(const fs::path& path, marathon::Wad& wad, std::ostream& log)
+{
+	const uint32_t sounds_tag = FOUR_CHARS_TO_INT('S','n','P','a');
+	std::ifstream sounds(path.string().c_str(), std::ios::in | std::ios::binary);
+	sounds.seekg(0, std::ios::end);
+	uint32_t length = sounds.tellg();
+	if (length <= 4096 * 1024)
+	{
+		std::vector<uint8_t> sounds_buffer(length);
+
+		sounds.seekg(0);
+		sounds.read(reinterpret_cast<char*>(sounds_buffer.data()), sounds_buffer.size());
+		wad.AddChunk(sounds_tag, sounds_buffer);
+	}
+	else
+	{
+		fs::path file = path.parent() / path.filename();
+		log << file.string() << " is longer than 4 MB; skipping" << std::endl;
 	}
 }
 
@@ -162,6 +183,7 @@ marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 	std::vector<fs::path> maps;
 	std::vector<fs::path> physics;
 	std::vector<fs::path> shapes;
+	std::vector<fs::path> sounds;
 	std::vector<fs::path> terminals;
 	std::vector<fs::path> luas;
 	std::vector<fs::path> mmls;
@@ -181,6 +203,8 @@ marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 			physics.push_back(*it);
 		else if (extension == ".ShPa")
 			shapes.push_back(*it);
+		else if (extension == ".SnPa")
+			sounds.push_back(*it);
 		else if (extension == ".txt")
 			terminals.push_back(*it);
 		else if (extension == ".lua")
@@ -212,6 +236,14 @@ marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 				if (shapes.size() > 1)
 					log << path.string() << ": multiple shapes patches found; using " << shapes[0].string() << std::endl;
 				MergeShapes(shapes[0], wad, log);
+			}
+			if (sounds.size())
+			{
+				if (sounds.size() > 1)
+				{
+					log << path.string() << ": multiple sounds patches found; using " << sounds[0].string() << std::endl;
+				}
+				MergeSounds(sounds[0], wad, log);
 			}
 			if (terminals.size())
 			{

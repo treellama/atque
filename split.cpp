@@ -137,6 +137,22 @@ void SaveShapes(marathon::Wad& wad, const std::string& path)
 	}
 }
 
+void SaveSounds(marathon::Wad& wad, const std::string& path)
+{
+	const uint32_t sounds_tag = FOUR_CHARS_TO_INT('S','n','P','a');
+	if (wad.HasChunk(sounds_tag))
+	{
+		const std::vector<uint8_t>& data = wad.GetChunk(sounds_tag);
+		if (data.size())
+		{
+			std::ofstream outfile(path.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+			outfile.write(reinterpret_cast<const char*>(data.data()), data.size());
+			set_type_code(path, "SnPa");
+		}
+		wad.RemoveChunk(sounds_tag);
+	}
+}
+
 void SaveScripts(marathon::Wad& wad, const fs::path& dir)
 {
 	using marathon::ScriptChunk;
@@ -316,6 +332,9 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 				
 				fs::path shapes_path = destfolder / (mac_roman_to_utf8(actual_level) + ".ShPa");
 				SaveShapes(wad, shapes_path.string());
+
+				fs::path sounds_path = destfolder / (mac_roman_to_utf8(actual_level) + ".SnPa");
+				SaveSounds(wad, sounds_path.string());
 				
 				fs::path terminal_path = destfolder / (mac_roman_to_utf8(actual_level) + ".term.txt");
 				SaveTerminal(wad, terminal_path.string());
