@@ -29,11 +29,12 @@
 #include "ferro/Wad.h"
 #include "ferro/ScriptChunk.h"
 #include "ferro/TerminalChunk.h"
-#include "ferro/Unimap.h"
+#include "ferro/Wadfile.h"
 
 #include "filesystem.h"
 #include "CLUTResource.h"
 #include "PICTResource.h"
+#include "ResourceManager.h"
 #include "SndResource.h"
 
 #include <iostream>
@@ -72,8 +73,8 @@ static std::vector<uint8> ReadFile(const std::string& path)
 
 void MergePhysics(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 {
-	marathon::Unimap wadfile;
-	if (wadfile.Open(path.string()))
+	marathon::Wadfile wadfile;
+	if (wadfile.Load(path.string()))
 	{
 		// check to make sure all physics are present
 		marathon::Wad physics = wadfile.GetWad(0);
@@ -218,8 +219,8 @@ marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 		if (maps.size() > 1)
 			log << path.string() << ": multiple maps found; using " << maps[0].string() << std::endl;
 
-		marathon::Unimap wadfile;
-		if (wadfile.Open(maps[0].string()) && wadfile.data_version() == 1)
+		marathon::Wadfile wadfile;
+		if (wadfile.Load(maps[0].string()) && wadfile.data_version() == 1)
 		{
 			wad = wadfile.GetWad(0);
 
@@ -271,7 +272,8 @@ marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 	return wad;
 }
 
-void MergeCLUTs(marathon::Unimap& wadfile, const fs::path& path)
+void MergeCLUTs(marathon::ResourceManager& resource_manager,
+				const fs::path& path)
 {
 	std::vector<fs::path> dir = path.ls();
 	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
@@ -281,19 +283,20 @@ void MergeCLUTs(marathon::Unimap& wadfile, const fs::path& path)
 			std::istringstream s(it->filename());
 			int16 index;
 			s >> index;
-			if (!s.fail() && index >= 128)
+			if (!s.fail())
 			{
 				CLUTResource clut;
 				if (clut.Import(it->string()))
 				{
-					wadfile.SetResource(FOUR_CHARS_TO_INT('c','l','u','t'), index, clut.Save());
+					resource_manager.resource_map()[std::make_pair(FOUR_CHARS_TO_INT('c','l','u','t'), index)] = clut.Save();
 				}
 			}
 		}
 	}
 }
 
-void MergePICTs(marathon::Unimap& wadfile, const fs::path& path)
+void MergePICTs(marathon::ResourceManager& resource_manager,
+				const fs::path& path)
 {
 	std::vector<fs::path> dir = path.ls();
 	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
@@ -303,19 +306,19 @@ void MergePICTs(marathon::Unimap& wadfile, const fs::path& path)
 			std::istringstream s(it->filename());
 			int16 index;
 			s >> index;
-			if (!s.fail() && index >= 128)
+			if (!s.fail())
 			{
 				PICTResource pict;
 				if (pict.Import(it->string()))
 				{
-					wadfile.SetResource(FOUR_CHARS_TO_INT('P','I','C','T'), index, pict.Save());
+					resource_manager.resource_map()[std::make_pair(FOUR_CHARS_TO_INT('P','I','C','T'), index)] = pict.Save();
 				}
 			}
 		}
 	}
 }
 
-void MergeSnds(marathon::Unimap& wadfile, const fs::path& path)
+void MergeSnds(marathon::ResourceManager& resource_manager, const fs::path& path)
 {
 	std::vector<fs::path> dir = path.ls();
 	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
@@ -325,19 +328,20 @@ void MergeSnds(marathon::Unimap& wadfile, const fs::path& path)
 			std::istringstream s(it->filename());
 			int16 index;
 			s >> index;
-			if (!s.fail() && index >= 128)
+			if (!s.fail())
 			{
 				SndResource snd;
 				if (snd.Import(it->string()))
 				{
-					wadfile.SetResource(FOUR_CHARS_TO_INT('s','n','d',' '), index, snd.Save());
+					resource_manager.resource_map()[std::make_pair(FOUR_CHARS_TO_INT('s','n','d',' '), index)] = snd.Save();
 				}
 			}
 		}
 	}
 }
 
-void MergeTEXTs(marathon::Unimap& wadfile, const fs::path& path)
+void MergeTEXTs(marathon::ResourceManager& resource_manager,
+				const fs::path& path)
 {
 	std::vector<fs::path> dir = path.ls();
 	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
@@ -347,16 +351,16 @@ void MergeTEXTs(marathon::Unimap& wadfile, const fs::path& path)
 			std::istringstream s(it->filename());
 			int16 index;
 			s >> index;
-			if (!s.fail() && index >= 128)
+			if (!s.fail())
 			{
-				wadfile.SetResource(FOUR_CHARS_TO_INT('t','e','x','t'), index, ReadFile(it->string()));
+				resource_manager.resource_map()[std::make_pair(FOUR_CHARS_TO_INT('T','E','X','T'), index)] = ReadFile(it->string());
 			}
 		}
-	}
-	
+	}	
 }
 
-void MergeResources(marathon::Unimap& wadfile, const fs::path& path)
+void MergeResources(marathon::ResourceManager& resource_manager,
+					const fs::path& path)
 {
 	std::vector<fs::path> dir = path.ls();
 	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
@@ -365,19 +369,19 @@ void MergeResources(marathon::Unimap& wadfile, const fs::path& path)
 		{
 			if (it->filename() == "TEXT")
 			{
-				MergeTEXTs(wadfile, *it);
+				MergeTEXTs(resource_manager, *it);
 			}
 			else if (it->filename() == "CLUT")
 			{
-				MergeCLUTs(wadfile, *it);
+				MergeCLUTs(resource_manager, *it);
 			}
 			else if (it->filename() == "PICT")
 			{
-				MergePICTs(wadfile, *it);
+				MergePICTs(resource_manager, *it);
 			}
 			else if (it->filename() == "snd")
 			{
-				MergeSnds(wadfile, *it);
+				MergeSnds(resource_manager, *it);
 			}
 		}
 	}
@@ -421,7 +425,9 @@ void atque::merge(const std::string& src, const std::string& dest, std::ostream&
 		throw merge_error("source must be a directory");
 	}
 
-	marathon::Unimap wadfile;
+	marathon::Wadfile wadfile;
+	marathon::ResourceManager resource_manager;
+	
 	fs::path level_select_path(src);
 	level_select_path = level_select_path / "Level Select Names.txt";
 	
@@ -448,7 +454,7 @@ void atque::merge(const std::string& src, const std::string& dest, std::ostream&
 		{
 			if (it->filename() == "Resources")
 			{
-				MergeResources(wadfile, *it);
+				MergeResources(resource_manager, *it);
 			}
 			else
 			{
@@ -480,6 +486,22 @@ void atque::merge(const std::string& src, const std::string& dest, std::ostream&
 	}
 
 	wadfile.file_name(fs::basename(fs::path(dest).filename()));
-	wadfile.Save(dest);
-	
+
+	if (resource_manager.CanSaveToResourceFork())
+	{
+		resource_manager.Save(dest, [&](std::ostream& stream) {
+			wadfile.Save(stream);
+		});
+	}
+	else if (resource_manager.CanSaveToWadfile(wadfile))
+	{
+		resource_manager.SaveToWadfile(wadfile);
+
+		std::ofstream stream(dest, std::ios_base::binary);
+		wadfile.Save(stream);
+	}
+	else
+	{
+		throw merge_error("resources too big to save to fork, and resource ids overlap map levels");		
+	}
 }

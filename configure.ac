@@ -9,7 +9,7 @@ AC_CONFIG_HEADER(config.h)
 
 AC_ARG_ENABLE(gui, [ --enable-gui	build atque GUI [default=yes]], , enable_gui=yes)
 
-AC_LANG(C++)
+AX_CXX_COMPILE_STDCXX_17([noext])
 
 AC_PROG_CC
 AC_PROG_CPP
@@ -32,7 +32,7 @@ esac
 AC_CHECK_HEADERS([sndfile.h], , AC_ERROR([Atque requires libsndfile]))
 AC_CHECK_LIB(sndfile, sf_open, LIBS="-lsndfile $LIBS", AC_ERROR([Atque requires libsndfile]))
 
-AX_BOOST_BASE([1.33.1])
+AX_BOOST_BASE([1.72])
 
 if [[ "x$enable_gui" = "xyes" ]]; then
 AM_OPTIONS_WXCONFIG  

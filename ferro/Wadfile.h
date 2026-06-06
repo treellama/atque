@@ -25,6 +25,7 @@
 #include "ferro/Wad.h"
 
 #include <iostream>
+#include <filesystem>
 #include <fstream>
 #include <map>
 #include <memory>
@@ -37,23 +38,21 @@ namespace marathon
 {
 	class crc_ostream;
 
-        class Wadfile 
+	class Wadfile 
 	{
-            friend std::ostream& operator<<(std::ostream&, const Wadfile&);
+        friend std::ostream& operator<<(std::ostream&, const Wadfile&);
 	public:
-		Wadfile() { stream_.exceptions(std::ifstream::eofbit | std::ifstream::failbit | std::ifstream::badbit);  }
+		bool Load(std::istream& stream);
+		bool Save(std::ostream& stream);
 
-		virtual bool Open(const std::string& path);
-		virtual void Close();
-
-		// will load the whole wadfile into memory!
-		virtual bool Save(const std::string& path);
+		bool Load(const std::filesystem::path& path);
+		bool Save(const std::filesystem::path& path);
 
 		bool HasWad(int16 index) { return directory_.count(index); }
-		const Wad& GetWad(int16 index);
+		const Wad& GetWad(int16 index) const;
 		void SetWad(int16 index, const Wad& wad);
 
-		std::vector<int16> GetWadIndexes();
+		std::vector<int16> GetWadIndexes() const;
 		std::vector<int16> GetEntryPointIndexes(uint32 entry_point_flags = ~0);
 
 		uint32 GetEntryPointFlags(int16 index);
@@ -70,11 +69,6 @@ namespace marathon
 		int16 version() { return header_.version; }
 		uint32 checksum() { return header_.checksum; }
 		uint32 parent_checksum() { return header_.parent_checksum; }
-
-	protected:
-		virtual bool Load(const std::string& path);
-		std::ifstream stream_;
-		virtual void Seek(std::streampos pos) { stream_.seekg(pos); }
 
 	private:
 		std::map<int16, Wad> wads_;

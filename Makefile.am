@@ -7,7 +7,7 @@ AM_LDFLAGS=$(BOOST_LDFLAGS)
 
 EASYBMP_SRCS=EasyBMP.cpp EasyBMP.h EasyBMP_BMP.h EasyBMP_DataStructures.h EasyBMP_VariousBMPutilities.h
 
-RESOURCE_SRCS=CLUTResource.h CLUTResource.cpp PICTResource.h PICTResource.cpp SndResource.h SndResource.cpp $(EASYBMP_SRCS)
+RESOURCE_SRCS=CLUTResource.h CLUTResource.cpp MacBinaryII.h MacBinaryII.cpp PICTResource.h PICTResource.cpp ResourceManager.h ResourceManager.cpp SndResource.h SndResource.cpp $(EASYBMP_SRCS)
 
 EXTRA_DIST=atque.wxg atque.icns Atque-Info.plist EasyBMP_License.txt COPYING.txt atque.xcodeproj/project.pbxproj atque.rc atque.ico README.md atque.png
 

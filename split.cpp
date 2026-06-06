@@ -27,16 +27,17 @@
 #include "ferro/ScriptChunk.h"
 #include "ferro/TerminalChunk.h"
 #include "ferro/Wadfile.h"
-#include "ferro/Unimap.h"
 
 #include "split.h"
 #include "filesystem.h"
 #include "CLUTResource.h"
 #include "PICTResource.h"
+#include "ResourceManager.h"
 #include "SndResource.h"
 
 #include <iostream>
 #include <iomanip>
+#include <optional>
 #include <sstream>
 #include <set>
 
@@ -198,9 +199,8 @@ void SaveScripts(marathon::Wad& wad, const fs::path& dir)
 
 }
 
-void SaveTEXT(marathon::Unimap& wad, marathon::Unimap::ResourceIdentifier id, const std::string& path)
+void SaveTEXT(const std::vector<uint8_t>& data, const std::string& path)
 {
-	const std::vector<uint8>& data = wad.GetResource(id);
 	if (data.size())
 	{
 		std::ofstream outfile(path.c_str(), std::ios::out | std::ios::trunc);
@@ -286,11 +286,36 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 		throw split_error("destination must be a directory");
 	}
 
-	marathon::Unimap wadfile;
-	if (!wadfile.Open(src.c_str()) or wadfile.data_version() < 1)
+	marathon::ResourceManager resource_manager;
+	std::optional<marathon::Wadfile> wadfile;
+	std::optional<std::vector<uint8_t>> data_fork;
+	
+	if (!resource_manager.Load(src, [&](std::istream& stream,
+										std::streamsize length)
+		{
+			auto start = stream.tellg();
+			
+			marathon::Wadfile check_wad;
+			if (check_wad.Load(stream) &&
+				check_wad.version() >= 1 &&
+				check_wad.data_version() == 1 &&
+				check_wad.GetWadIndexes().size())
+			{
+				resource_manager.LoadFromWadfile(check_wad);
+				wadfile = std::move(check_wad);
+			}
+			else
+			{
+				stream.seekg(start);
+
+				std::vector<uint8_t> data(length);
+				stream.read(reinterpret_cast<char*>(data.data()), data.size());
+				data_fork = std::move(data);
+			}
+		}))
 	{
-		throw split_error("input must be a Marathon 2 or Infinity scenario");
-	}
+		throw split_error("error loading resource or data fork");
+	};
 
 	if (!fs::exists(dest))
 	{
@@ -302,121 +327,130 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 
 	std::map<int16, std::string> level_select_names;
 
-	std::vector<int16> indexes = wadfile.GetWadIndexes();
-	for (std::vector<int16>::iterator it = indexes.begin(); it != indexes.end(); ++it)
+	if (wadfile)
 	{
-		marathon::Wad wad = wadfile.GetWad(*it);
-		if (wad.HasChunk(marathon::MapInfo::kTag))
+		for (const auto& index : wadfile->GetWadIndexes())
 		{
-			try {
-				marathon::MapInfo minf(wad.GetChunk(marathon::MapInfo::kTag));
-				
-				std::string level = wadfile.GetLevelName(*it);
-				std::string actual_level = minf.level_name();
-				if (level != actual_level)
-				{
-					level_select_names[*it] = level;
-				}
-
-				level = sanitize(level);
-				actual_level = sanitize(actual_level);
-
-				std::ostringstream level_number;
-				level_number << std::setw(2) << std::setfill('0') << *it;
-				
-				fs::path destfolder = fs::path(dest) / (level_number.str() + " " + mac_roman_to_utf8(level));
-				destfolder.create_directory();
-				
-				fs::path physics_path = destfolder / (mac_roman_to_utf8(actual_level) + ".phyA");
-				SavePhysics(wad, actual_level, physics_path.string());
-				
-				fs::path shapes_path = destfolder / (mac_roman_to_utf8(actual_level) + ".ShPa");
-				SaveShapes(wad, shapes_path.string());
-
-				fs::path sounds_path = destfolder / (mac_roman_to_utf8(actual_level) + ".SnPa");
-				SaveSounds(wad, sounds_path.string());
-				
-				fs::path terminal_path = destfolder / (mac_roman_to_utf8(actual_level) + ".term.txt");
-				SaveTerminal(wad, terminal_path.string());
-
-				SaveScripts(wad, destfolder);
-				
-				fs::path level_path = destfolder / (mac_roman_to_utf8(actual_level) + ".sceA");
-				SaveLevel(wad, actual_level, level_path.string());
-			}
-			catch (const std::exception&)
+			marathon::Wad wad = wadfile->GetWad(index);
+			if (wad.HasChunk(marathon::MapInfo::kTag))
 			{
-				std::ostringstream error;
-				error << "error writing level " << *it << "; aborting";
-				throw split_error(error.str());
-			}
-
+				try
+				{
+					marathon::MapInfo minf(wad.GetChunk(marathon::MapInfo::kTag));
+					
+					std::string level = wadfile->GetLevelName(index);
+					std::string actual_level = minf.level_name();
+					if (level != actual_level)
+					{
+						level_select_names[index] = level;
+					}
+					
+					level = sanitize(level);
+					actual_level = sanitize(actual_level);
+					
+					std::ostringstream level_number;
+					level_number << std::setw(2) << std::setfill('0') << index;
+					
+					fs::path destfolder = fs::path(dest) / (level_number.str() + " " + mac_roman_to_utf8(level));
+					destfolder.create_directory();
+					
+					fs::path physics_path = destfolder / (mac_roman_to_utf8(actual_level) + ".phyA");
+					SavePhysics(wad, actual_level, physics_path.string());
+					
+					fs::path shapes_path = destfolder / (mac_roman_to_utf8(actual_level) + ".ShPa");
+					SaveShapes(wad, shapes_path.string());
+					
+					fs::path sounds_path = destfolder / (mac_roman_to_utf8(actual_level) + ".SnPa");
+					SaveSounds(wad, sounds_path.string());
+					
+					fs::path terminal_path = destfolder / (mac_roman_to_utf8(actual_level) + ".term.txt");
+					SaveTerminal(wad, terminal_path.string());
+					
+					SaveScripts(wad, destfolder);
+					
+					fs::path level_path = destfolder / (mac_roman_to_utf8(actual_level) + ".sceA");
+					SaveLevel(wad, actual_level, level_path.string());
+				}
+				catch (const std::exception&)
+				{
+					std::ostringstream error;
+					error << "error writing level " << index << "; aborting";
+					throw split_error(error.str());
+				}
+			}				
 		}
+	}
+	else
+	{
+		fs::path data_fork_path(dest);
+		data_fork_path = data_fork_path / "Data.bin";
+		std::ofstream s{data_fork_path.string().c_str(), std::ios::out | std::ios::binary | std::ios::trunc};
+		s.write(reinterpret_cast<char*>(data_fork->data()), data_fork->size());
 	}
 
 	fs::path resource_path = fs::path(dest) / "Resources";
-	resource_path.create_directory();
+	if (resource_manager.resource_map().size())
+	{
+		resource_path.create_directory();
+	}
 
 	std::map<int16, std::string> resource_names;
 
-	std::vector<marathon::Unimap::ResourceIdentifier> resources = wadfile.GetResourceIdentifiers();
-	for (std::vector<marathon::Unimap::ResourceIdentifier>::const_iterator it = resources.begin(); it != resources.end(); ++it)
+	for (const auto& [res_id, res_data] : resource_manager.resource_map())
 	{
-		if (!level_select_names.count(it->second))
-		{
-			std::string resource_name = wadfile.GetResourceName(it->second);
-			if (!resource_name.empty())
-				level_select_names[it->second] = resource_name;
-		}
-
+		const auto& [res_type, res_index] = res_id;
+		
 		std::ostringstream id;
-		id << std::setw(5) << std::setfill('0') << it->second;
+		id << std::setw(5) << std::setfill('0') << res_index;
 
-		if (it->first == FOUR_CHARS_TO_INT('P','I','C','T') || it->first == FOUR_CHARS_TO_INT('p','i','c','t'))
+		if (res_type == FOUR_CHARS_TO_INT('P','I','C','T') ||
+			res_type == FOUR_CHARS_TO_INT('p','i','c','t'))
 		{
 			fs::path pict_dir = resource_path / "PICT";
 			pict_dir.create_directory();
 			
 			fs::path pict_path = pict_dir / id.str(); 
 			PICTResource pict;
-			if (it->first == FOUR_CHARS_TO_INT('P','I','C','T'))
+			if (res_type == FOUR_CHARS_TO_INT('P','I','C','T'))
 			{
-				pict.Load(wadfile.GetResource(*it));
+				pict.Load(res_data);
 			}
 			else
 			{
-				pict.LoadRaw(wadfile.GetResource(*it), wadfile.GetResource(marathon::Unimap::ResourceIdentifier(FOUR_CHARS_TO_INT('c','l','u','t'), it->second)));
+				auto clut_data = resource_manager.resource_map()[std::make_pair(FOUR_CHARS_TO_INT('c','l','u','t'), res_index)];
+				pict.LoadRaw(res_data, clut_data);
 			}
 
 			if (pict.IsUnparsed())
-				log << "Exporting PICT " << it->second << " as .pct (" << pict.WhyUnparsed() << ")" << std::endl;
+				log << "Exporting PICT " << res_index << " as .pct (" << pict.WhyUnparsed() << ")" << std::endl;
 
 			pict.Export(pict_path.string());
 		}
-		else if (it->first == FOUR_CHARS_TO_INT('T','E','X','T') || it->first == FOUR_CHARS_TO_INT('t','e','x','t'))
+		else if (res_type == FOUR_CHARS_TO_INT('T','E','X','T') ||
+				 res_type == FOUR_CHARS_TO_INT('t','e','x','t'))
 		{
 			fs::path text_dir = resource_path / "TEXT";
 			text_dir.create_directory();
 
 			fs::path text_path = text_dir / (id.str() + ".txt");
-			SaveTEXT(wadfile, *it, text_path.string());
+			SaveTEXT(res_data, text_path.string());
 		}
-		else if (it->first == FOUR_CHARS_TO_INT('c','l','u','t'))
+		else if (res_type == FOUR_CHARS_TO_INT('c','l','u','t'))
 		{
 			fs::path clut_dir = resource_path / "CLUT";
 			clut_dir.create_directory();
 			
 			fs::path clut_path = clut_dir / (id.str() + ".act");
-			CLUTResource clut(wadfile.GetResource(*it));
+			CLUTResource clut(res_data);
 			clut.Export(clut_path.string());
 		}
-		else if (it->first == FOUR_CHARS_TO_INT('s','n','d',' '))
+		else if (res_type == FOUR_CHARS_TO_INT('s','n','d',' '))
 		{
 			fs::path snd_dir = resource_path / "snd";
 			snd_dir.create_directory();
 			
 			fs::path snd_path = snd_dir / (id.str() + ".wav");
-			SndResource snd(wadfile.GetResource(*it));
+			SndResource snd(res_data);
 			snd.Export(snd_path.string());
 		}
 	}

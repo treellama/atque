@@ -26,46 +26,39 @@
 
 using namespace marathon;
 
-bool Wadfile::Open(const std::string& filename)
-{
-	if (stream_.is_open()) stream_.close();
-
-	try {
-		stream_.open(filename.c_str(), std::ios::in | std::ios::binary);
-	} 
-	catch (std::ios_base::failure e)
-	{
-		return false;
-	}
-
-	return Load(filename);
-}
-
-bool Wadfile::Load(const std::string&)
+bool Wadfile::Load(std::istream& stream)
 {
 	directory_.clear();
+	directory_data_.clear();
+	
 	try {
-		// load the header
-		Seek(0);
-		header_.Load(stream_);
+		auto start = stream.tellg();
+		header_.Load(stream);
 
 		// load the directory
-		Seek(header_.directory_offset);
+		stream.seekg(start + std::streamoff{header_.directory_offset});
 		for (int i = 0; i < header_.wad_count; ++i)
 		{
 			DirectoryEntry entry;
-			entry.Load(stream_, header_.directory_entry_base_size, i);
+			entry.Load(stream, header_.directory_entry_base_size, i);
 			directory_[entry.index] = entry;
 			if (header_.application_specific_directory_data_size == DirectoryData::kSize)
 			{
-				directory_data_[entry.index].Load(stream_);
+				directory_data_[entry.index].Load(stream);
 			}
 			else
 			{
-				stream_.ignore(header_.application_specific_directory_data_size);
+				stream.ignore(header_.application_specific_directory_data_size);
 			}
 		}
-	} 
+
+		// load all the wads
+		for (const auto& [index, entry] : directory_)
+		{
+			stream.seekg(start + std::streamoff{entry.offset});
+			wads_[index].Load(stream, header_.entry_header_size);
+		}
+	}
 	catch (std::ios_base::failure e)
 	{
 		return false;
@@ -74,20 +67,10 @@ bool Wadfile::Load(const std::string&)
 	return true;	
 }
 
-void Wadfile::Close()
+bool Wadfile::Save(std::ostream& stream)
 {
-	directory_.clear();
-	if (stream_.is_open()) stream_.close();
-}
-
-bool Wadfile::Save(const std::string& path)
-{
-	std::ofstream stream;
-	stream.exceptions(std::ofstream::eofbit | std::ofstream::failbit | std::ofstream::badbit);
-	
 	try 
 	{
-		stream.open(path.c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
 		crc_ostream crc_stream(stream);
 
 		std::streampos start = crc_stream.tellp();
@@ -160,15 +143,21 @@ bool Wadfile::Save(const std::string& path)
 	return true;
 }
 
-const Wad& Wadfile::GetWad(int16 index)
+bool Wadfile::Load(const std::filesystem::path& path)
 {
-	if (!wads_.count(index))
-	{
-		std::vector<char> buffer(directory_[index].size);
-		Seek(directory_[index].offset);
-		wads_[index].Load(stream_, header_.entry_header_size);
-	}
-	return wads_[index];
+	std::ifstream stream{path, std::ios_base::in | std::ios_base::binary};
+	return Load(stream);
+}
+
+bool Wadfile::Save(const std::filesystem::path& path)
+{
+	std::ofstream stream{path, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc};
+	return Save(stream);
+}
+
+const Wad& Wadfile::GetWad(int16 index) const
+{
+	return wads_.at(index);
 }
 
 void Wadfile::SetWad(int16 index, const Wad& wad)
@@ -237,7 +226,7 @@ std::vector<int16> Wadfile::GetEntryPointIndexes(uint32 entry_point_flags)
 	return v;
 }
 
-std::vector<int16> Wadfile::GetWadIndexes()
+std::vector<int16> Wadfile::GetWadIndexes() const
 {
 	std::vector<int16> v;
 	for (std::map<int16, DirectoryEntry>::const_iterator it = directory_.begin(); it != directory_.end(); ++it)
