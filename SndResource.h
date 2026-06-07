@@ -23,6 +23,7 @@
 
 #include "ferro/cstypes.h"
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -38,8 +39,8 @@ namespace atque
 		bool Load(const std::vector<uint8>&);
 		std::vector<uint8> Save() const;
 
-		void Export(const std::string& path) const;
-		bool Import(const std::string& path);
+		void Export(const std::filesystem::path& path) const;
+		bool Import(const std::filesystem::path& path);
 
 	private:
 		bool UnpackStandardSystem7Header(AIStreamBE&);

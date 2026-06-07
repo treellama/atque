@@ -29,12 +29,12 @@
 #include "ferro/Wadfile.h"
 
 #include "split.h"
-#include "filesystem.h"
 #include "CLUTResource.h"
 #include "PICTResource.h"
 #include "ResourceManager.h"
 #include "SndResource.h"
 
+#include <filesystem>
 #include <iostream>
 #include <iomanip>
 #include <optional>
@@ -74,6 +74,7 @@ static void set_type_code(const std::string&, const std::string&) { }
 #endif
 
 using namespace atque;
+namespace fs = std::filesystem;
 
 const std::vector<uint32> physics_chunks = boost::assign::list_of
 	(FOUR_CHARS_TO_INT('M','N','p','x'))
@@ -111,7 +112,7 @@ void SavePhysics(marathon::Wad& wad, const std::string& name, const std::string&
 	}
 }
 
-void SaveLevel(marathon::Wad& wad, const std::string& name, const std::string& path)
+void SaveLevel(marathon::Wad& wad, const std::string& name, const fs::path& path)
 {
 	// export everything remaining in the wad file!
 	marathon::Wadfile wadfile;
@@ -122,7 +123,7 @@ void SaveLevel(marathon::Wad& wad, const std::string& name, const std::string& p
 }
 
 // removes shapes chunk from Wad, and saves file
-void SaveShapes(marathon::Wad& wad, const std::string& path)
+void SaveShapes(marathon::Wad& wad, const fs::path& path)
 {
 	const uint32 shapes_tag = FOUR_CHARS_TO_INT('S','h','P','a');
 	if (wad.HasChunk(shapes_tag))
@@ -130,7 +131,7 @@ void SaveShapes(marathon::Wad& wad, const std::string& path)
 		const std::vector<uint8>& data = wad.GetChunk(shapes_tag);
 		if (data.size())
 		{
-			std::ofstream outfile(path.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+			std::ofstream outfile(path, std::ios::trunc | std::ios::binary);
 			outfile.write(reinterpret_cast<const char*>(&data[0]), data.size());
 			set_type_code(path, "ShPa");
 		}
@@ -138,7 +139,7 @@ void SaveShapes(marathon::Wad& wad, const std::string& path)
 	}
 }
 
-void SaveSounds(marathon::Wad& wad, const std::string& path)
+void SaveSounds(marathon::Wad& wad, const fs::path& path)
 {
 	const uint32_t sounds_tag = FOUR_CHARS_TO_INT('S','n','P','a');
 	if (wad.HasChunk(sounds_tag))
@@ -146,7 +147,7 @@ void SaveSounds(marathon::Wad& wad, const std::string& path)
 		const std::vector<uint8_t>& data = wad.GetChunk(sounds_tag);
 		if (data.size())
 		{
-			std::ofstream outfile(path.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+			std::ofstream outfile(path, std::ios::trunc | std::ios::binary);
 			outfile.write(reinterpret_cast<const char*>(data.data()), data.size());
 			set_type_code(path, "SnPa");
 		}
@@ -166,10 +167,11 @@ void SaveScripts(marathon::Wad& wad, const fs::path& dir)
 		{
 			if (it->data.size())
 			{
-				std::string filename = it->name + ".lua";
-				fs::path path = dir / filename;
+				auto path = dir;
+				path /= fs::u8path(it->name);
+				path += ".lua";
 
-				std::ofstream outfile(path.string().c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+				std::ofstream outfile(path, std::ios::trunc | std::ios::binary);
 				outfile.write(reinterpret_cast<const char*>(&it->data[0]), it->data.size());
 			}
 		}
@@ -185,10 +187,11 @@ void SaveScripts(marathon::Wad& wad, const fs::path& dir)
 		{
 			if (it->data.size())
 			{
-				std::string filename = it->name + ".mml";
-				fs::path path = dir / filename;
-				
-				std::ofstream outfile(path.string().c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+				auto path = dir;
+				path /= fs::u8path(it->name);
+				path += ".mml";
+
+				std::ofstream outfile(path, std::ios::trunc | std::ios::binary);
 				outfile.write(reinterpret_cast<const char*>(&it->data[0]), it->data.size());
 			}
 		}
@@ -199,22 +202,22 @@ void SaveScripts(marathon::Wad& wad, const fs::path& dir)
 
 }
 
-void SaveTEXT(const std::vector<uint8_t>& data, const std::string& path)
+void SaveTEXT(const std::vector<uint8_t>& data, const fs::path& path)
 {
 	if (data.size())
 	{
-		std::ofstream outfile(path.c_str(), std::ios::out | std::ios::trunc);
+		std::ofstream outfile(path, std::ios::trunc);
 		outfile.write(reinterpret_cast<const char*>(&data[0]), data.size());
 	}
 }
 
-void SaveTerminal(marathon::Wad& wad, const std::string& path)
+void SaveTerminal(marathon::Wad& wad, const fs::path& path)
 {
 	if (wad.HasChunk(marathon::TerminalChunk::kTag))
 	{
 		marathon::TerminalChunk chunk;
 		chunk.Load(wad.GetChunk(marathon::TerminalChunk::kTag));
-		chunk.Decompile(path);
+		chunk.Decompile(path.string());
 		wad.RemoveChunk(marathon::TerminalChunk::kTag);
 	}
 }
@@ -242,11 +245,7 @@ static std::string sanitize(const std::string& input)
 			result.push_back('-');
 			break;
 		default:
-#ifdef __WIN32__
-			if (static_cast<unsigned char>(*it) >= ' ' && static_cast<unsigned char>(*it) < 0x7f)
-#else
 			if (static_cast<unsigned char>(*it) >= ' ')
-#endif
 			{
 				result.push_back(*it);
 			}
@@ -256,16 +255,12 @@ static std::string sanitize(const std::string& input)
 
 #ifdef __WIN32__
 	// strings can't end with space or dot!?
-	std::string::size_type pos = result.find_last_not_of(" .");
-	if (pos != std::string::npos)
-	{
-		result.erase(pos + 1);
-	}
-	else
-	{
-		result = "";
-	}
+	result.erase(result.find_last_not_of(" .") + 1);
 #endif
+
+	// erase leading dots so files don't appear hidden in Linux
+	result.erase(0, result.find_first_not_of("."));
+	
 	if (result == "")
 	{
 		result = "Unnamed Level";
@@ -274,11 +269,11 @@ static std::string sanitize(const std::string& input)
 	return result;
 }
 
-void atque::split(const std::string& src, const std::string& dest, std::ostream& log)
+void atque::split(const fs::path& src, const fs::path& dest, std::ostream& log)
 {
 	if (!fs::exists(src))
 	{
-		throw split_error(src + " does not exist");
+		throw split_error(src.string() + " does not exist");
 	}
 	
 	if (fs::exists(dest) && !fs::is_directory(dest))
@@ -351,24 +346,36 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 					std::ostringstream level_number;
 					level_number << std::setw(2) << std::setfill('0') << index;
 					
-					fs::path destfolder = fs::path(dest) / (level_number.str() + " " + mac_roman_to_utf8(level));
-					destfolder.create_directory();
+					auto destfolder = dest;
+					destfolder /= level_number.str() + " ";
+					destfolder += fs::u8path(mac_roman_to_utf8(level));
+					fs::create_directory(destfolder);
 					
-					fs::path physics_path = destfolder / (mac_roman_to_utf8(actual_level) + ".phyA");
-					SavePhysics(wad, actual_level, physics_path.string());
+					auto physics_path = destfolder;
+					physics_path /= fs::u8path(mac_roman_to_utf8(actual_level));
+					physics_path += ".phyA";
+					SavePhysics(wad, actual_level, physics_path);
 					
-					fs::path shapes_path = destfolder / (mac_roman_to_utf8(actual_level) + ".ShPa");
-					SaveShapes(wad, shapes_path.string());
+					auto shapes_path = destfolder;
+					shapes_path = fs::u8path(mac_roman_to_utf8(actual_level));
+					shapes_path += ".ShPa";
+					SaveShapes(wad, shapes_path);
 					
-					fs::path sounds_path = destfolder / (mac_roman_to_utf8(actual_level) + ".SnPa");
-					SaveSounds(wad, sounds_path.string());
+					auto sounds_path = destfolder;
+					sounds_path /= fs::u8path(mac_roman_to_utf8(actual_level));
+					sounds_path += ".SnPa";
+					SaveSounds(wad, sounds_path);
 					
-					fs::path terminal_path = destfolder / (mac_roman_to_utf8(actual_level) + ".term.txt");
+					auto terminal_path = destfolder;
+					terminal_path /= fs::u8path(mac_roman_to_utf8(actual_level));
+					terminal_path += ".term.txt";
 					SaveTerminal(wad, terminal_path.string());
 					
 					SaveScripts(wad, destfolder);
 					
-					fs::path level_path = destfolder / (mac_roman_to_utf8(actual_level) + ".sceA");
+					auto level_path = destfolder;
+					level_path /= fs::u8path(mac_roman_to_utf8(actual_level));
+					level_path += ".sceA";
 					SaveLevel(wad, actual_level, level_path.string());
 				}
 				catch (const std::exception&)
@@ -391,7 +398,7 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 	fs::path resource_path = fs::path(dest) / "Resources";
 	if (resource_manager.resource_map().size())
 	{
-		resource_path.create_directory();
+		fs::create_directory(resource_path);
 	}
 
 	std::map<int16, std::string> resource_names;
@@ -406,10 +413,10 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 		if (res_type == FOUR_CHARS_TO_INT('P','I','C','T') ||
 			res_type == FOUR_CHARS_TO_INT('p','i','c','t'))
 		{
-			fs::path pict_dir = resource_path / "PICT";
-			pict_dir.create_directory();
+			auto pict_dir = resource_path / "PICT";
+			fs::create_directory(pict_dir);
 			
-			fs::path pict_path = pict_dir / id.str(); 
+			auto pict_path = pict_dir / id.str(); 
 			PICTResource pict;
 			if (res_type == FOUR_CHARS_TO_INT('P','I','C','T'))
 			{
@@ -429,27 +436,27 @@ void atque::split(const std::string& src, const std::string& dest, std::ostream&
 		else if (res_type == FOUR_CHARS_TO_INT('T','E','X','T') ||
 				 res_type == FOUR_CHARS_TO_INT('t','e','x','t'))
 		{
-			fs::path text_dir = resource_path / "TEXT";
-			text_dir.create_directory();
+			auto text_dir = resource_path / "TEXT";
+			fs::create_directory(text_dir);
 
-			fs::path text_path = text_dir / (id.str() + ".txt");
+			auto text_path = text_dir / (id.str() + ".txt");
 			SaveTEXT(res_data, text_path.string());
 		}
 		else if (res_type == FOUR_CHARS_TO_INT('c','l','u','t'))
 		{
-			fs::path clut_dir = resource_path / "CLUT";
-			clut_dir.create_directory();
+			auto clut_dir = resource_path / "CLUT";
+			fs::create_directory(clut_dir);
 			
-			fs::path clut_path = clut_dir / (id.str() + ".act");
+			auto clut_path = clut_dir / (id.str() + ".act");
 			CLUTResource clut(res_data);
 			clut.Export(clut_path.string());
 		}
 		else if (res_type == FOUR_CHARS_TO_INT('s','n','d',' '))
 		{
-			fs::path snd_dir = resource_path / "snd";
-			snd_dir.create_directory();
+			auto snd_dir = resource_path / "snd";
+			fs::create_directory(snd_dir);
 			
-			fs::path snd_path = snd_dir / (id.str() + ".wav");
+			auto snd_path = snd_dir / (id.str() + ".wav");
 			SndResource snd(res_data);
 			snd.Export(snd_path.string());
 		}

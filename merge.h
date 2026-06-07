@@ -21,6 +21,7 @@
 #ifndef MERGE_H
 #define MERGE_H
 
+#include <filesystem>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -28,13 +29,14 @@
 
 namespace atque
 {
-	class merge_error : public std::runtime_error
-	{
-	public:
-		merge_error(const std::string& what) : std::runtime_error(what) { }
-	};
+class merge_error : public std::runtime_error {
+public:
+	merge_error(const std::string& what) : std::runtime_error(what) { }
+};
 
-	void merge(const std::string& source, const std::string& destination, std::ostream& log);
+void merge(const std::filesystem::path& source,
+		   const std::filesystem::path& destination,
+		   std::ostream& log);
 }
 
 #endif

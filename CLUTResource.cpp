@@ -91,11 +91,11 @@ std::vector<uint8> CLUTResource::Save() const
 	return result;
 }
 
-bool CLUTResource::Import(const std::string& path)
+bool CLUTResource::Import(const std::filesystem::path& path)
 {
-	if (algo::iends_with(path, ".act"))
+	if (path.extension() == ".act")
 	{
-		std::ifstream infile(path.c_str(), std::ios::binary);
+		std::ifstream infile(path, std::ios::binary);
 		infile.seekg(0, std::ios::end);
 		uint32 size = infile.tellg();
 		infile.seekg(0, std::ios::beg);
@@ -129,7 +129,7 @@ bool CLUTResource::Import(const std::string& path)
 		
 		return true;
 	}
-	else if (algo::iends_with(path, ".bmp"))
+	else if (path.extension() == ".bmp")
 	{
 		BMP bitmap;
 		if (bitmap.ReadFromFile(path.c_str()) && bitmap.TellNumberOfColors() <= 256)
@@ -150,9 +150,9 @@ bool CLUTResource::Import(const std::string& path)
 	return false;
 }
 
-void CLUTResource::Export(const std::string& path) const
+void CLUTResource::Export(const std::filesystem::path& path) const
 {
-	std::ofstream outfile(path.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+	std::ofstream outfile(path, std::ios::trunc | std::ios::binary);
 	std::vector<uint8> actData(3 * 256 + 4);
 	AOStreamBE stream(&actData[0], actData.size());
 	

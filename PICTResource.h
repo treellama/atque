@@ -24,6 +24,7 @@
 #include "ferro/cstypes.h"
 #include "EasyBMP.h"
 
+#include <filesystem>
 #include <stdexcept>
 #include <vector>
 
@@ -42,8 +43,8 @@ namespace atque
 		bool LoadRaw(const std::vector<uint8>& raw_data, const std::vector<uint8>& clut);
 		std::vector<uint8> Save() const;
 
-		bool Import(const std::string& path);
-		void Export(const std::string& path);
+		bool Import(const std::filesystem::path& path);
+		void Export(const std::filesystem::path& path);
 
 		bool IsUnparsed() { return bitmap_.TellHeight() == 1 && bitmap_.TellWidth() == 1 && jpeg_.size() == 0; }
 		std::string WhyUnparsed() { return why_unparsed_; }

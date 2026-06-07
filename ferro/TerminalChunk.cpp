@@ -661,9 +661,9 @@ std::vector<uint8> TerminalChunk::Save() const
 	return v;
 }
 
-void TerminalChunk::Compile(const std::string& path)
+void TerminalChunk::Compile(const std::filesystem::path& path)
 {
-	std::ifstream stream(path.c_str());
+	std::ifstream stream(path);
 
 	terminal_texts_.clear();
 	while (!stream.eof())
@@ -674,9 +674,9 @@ void TerminalChunk::Compile(const std::string& path)
 	}
 }
 
-void TerminalChunk::Decompile(const std::string& path) const
+void TerminalChunk::Decompile(const std::filesystem::path& path) const
 {
-	std::ofstream stream(path.c_str(), std::ios::out | std::ios::trunc);
+	std::ofstream stream(path, std::ios::trunc);
 	
 	for (int index = 0; index < terminal_texts_.size(); ++index)
 	{

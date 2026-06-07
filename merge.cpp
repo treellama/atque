@@ -31,7 +31,6 @@
 #include "ferro/TerminalChunk.h"
 #include "ferro/Wadfile.h"
 
-#include "filesystem.h"
 #include "CLUTResource.h"
 #include "PICTResource.h"
 #include "ResourceManager.h"
@@ -47,6 +46,7 @@
 
 using namespace atque;
 namespace algo = boost::algorithm;
+namespace fs = std::filesystem;
 
 const std::vector<uint32> physics_chunks = boost::assign::list_of
 	(FOUR_CHARS_TO_INT('M','N','p','x'))
@@ -56,12 +56,9 @@ const std::vector<uint32> physics_chunks = boost::assign::list_of
 	(FOUR_CHARS_TO_INT('W','P','p','x'))
 	;
 
-static std::vector<uint8> ReadFile(const std::string& path)
+static std::vector<uint8> ReadFile(const fs::path& path)
 {
-	std::ifstream infile;
-	infile.open(path.c_str(), std::ios::binary);
-	
-	infile.seekg(0, std::ios::end);
+	std::ifstream infile(path, std::ios::binary | std::ios::ate);
 	int length = infile.tellg();
 	infile.seekg(0, std::ios::beg);
 
@@ -74,7 +71,7 @@ static std::vector<uint8> ReadFile(const std::string& path)
 void MergePhysics(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 {
 	marathon::Wadfile wadfile;
-	if (wadfile.Load(path.string()))
+	if (wadfile.Load(path))
 	{
 		// check to make sure all physics are present
 		marathon::Wad physics = wadfile.GetWad(0);
@@ -82,8 +79,7 @@ void MergePhysics(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 		{
 			if (!physics.HasChunk(*it))
 			{
-				fs::path file = path.parent() / path.filename();
-				log << file.string() << " is not a valid physics model; skipping" << std::endl;
+				log << path << " is not a valid physics model; skipping" << std::endl;
 				return;
 			}
 		}
@@ -98,8 +94,7 @@ void MergePhysics(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 void MergeShapes(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 {
 	const uint32 shapes_tag = FOUR_CHARS_TO_INT('S','h','P','a');
-	std::ifstream shapes(path.string().c_str(), std::ios::in | std::ios::binary);
-	shapes.seekg(0, std::ios::end);
+	std::ifstream shapes(path, std::ios::binary | std::ios::ate);
 	uint32 length = shapes.tellg();
 	if (length <= 4096 * 1024)
 	{
@@ -111,16 +106,14 @@ void MergeShapes(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 	}
 	else
 	{
-		fs::path file = path.parent() / path.filename();
-		log << file.string() << " is larger than 4 MB; skipping" << std::endl;
+		log << path << " is larger than 4 MB; skipping" << std::endl;
 	}
 }
 
 void MergeSounds(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 {
 	const uint32_t sounds_tag = FOUR_CHARS_TO_INT('S','n','P','a');
-	std::ifstream sounds(path.string().c_str(), std::ios::in | std::ios::binary);
-	sounds.seekg(0, std::ios::end);
+	std::ifstream sounds(path, std::ios::binary | std::ios::ate);
 	uint32_t length = sounds.tellg();
 	if (length <= 4096 * 1024)
 	{
@@ -132,8 +125,7 @@ void MergeSounds(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 	}
 	else
 	{
-		fs::path file = path.parent() / path.filename();
-		log << file.string() << " is longer than 4 MB; skipping" << std::endl;
+		log << path << " is longer than 4 MB; skipping" << std::endl;
 	}
 }
 
@@ -142,13 +134,12 @@ void MergeTerminal(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 	try 
 	{
 		marathon::TerminalChunk chunk;
-		chunk.Compile(path.string());
+		chunk.Compile(path);
 		wad.AddChunk(marathon::TerminalChunk::kTag, chunk.Save());
 	}
 	catch (const marathon::TerminalChunk::ParseError& e)
 	{
-		fs::path file = path.parent() / path.filename();
-		log << file.string() << ": " << e.what() << "; skipping" << std::endl;
+		log << path << ": " << e.what() << "; skipping" << std::endl;
 	}
 }
 
@@ -158,8 +149,8 @@ void MergeScripts(const std::vector<fs::path> paths, marathon::Wad& wad, uint32 
 	for (std::vector<fs::path>::const_iterator it = paths.begin(); it != paths.end(); ++it)
 	{
 		marathon::ScriptChunk::Script script;
-		script.name = fs::basename(it->filename());
-		script.data = ReadFile(it->string());
+		script.name = it->stem();
+		script.data = ReadFile(*it);
 		chunk.AddScript(script);
 	}
 
@@ -188,30 +179,30 @@ marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 	std::vector<fs::path> terminals;
 	std::vector<fs::path> luas;
 	std::vector<fs::path> mmls;
-	
-	std::vector<fs::path> dir = path.ls();	
-	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
+
+	for (const auto& dir_entry : fs::directory_iterator{path})
 	{
-		if (it->filename()[0] == '.')
+		// skip hidden files
+		if (dir_entry.path().filename().string()[0] == '.')
 		{
 			continue;
 		}
 
-		std::string extension = fs::extension(it->filename());
+		auto extension = dir_entry.path().extension();
 		if (extension == ".sceA")
-			maps.push_back(*it);
+			maps.push_back(dir_entry);
 		else if (extension == ".phyA")
-			physics.push_back(*it);
+			physics.push_back(dir_entry);
 		else if (extension == ".ShPa")
-			shapes.push_back(*it);
+			shapes.push_back(dir_entry);
 		else if (extension == ".SnPa")
-			sounds.push_back(*it);
+			sounds.push_back(dir_entry);
 		else if (extension == ".txt")
-			terminals.push_back(*it);
+			terminals.push_back(dir_entry);
 		else if (extension == ".lua")
-			luas.push_back(*it);
+			luas.push_back(dir_entry);
 		else if (extension == ".mml")
-			mmls.push_back(*it);
+			mmls.push_back(dir_entry);
 	}
 
 	if (maps.size())
@@ -275,18 +266,17 @@ marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 void MergeCLUTs(marathon::ResourceManager& resource_manager,
 				const fs::path& path)
 {
-	std::vector<fs::path> dir = path.ls();
-	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
+	for (const auto& dir_entry : fs::directory_iterator{path})
 	{
-		if (!it->is_directory())
+		if (dir_entry.is_regular_file())
 		{
-			std::istringstream s(it->filename());
+			std::istringstream s(dir_entry.path().filename());
 			int16 index;
 			s >> index;
 			if (!s.fail())
 			{
 				CLUTResource clut;
-				if (clut.Import(it->string()))
+				if (clut.Import(dir_entry.path()))
 				{
 					resource_manager.resource_map()[std::make_pair(FOUR_CHARS_TO_INT('c','l','u','t'), index)] = clut.Save();
 				}
@@ -298,18 +288,17 @@ void MergeCLUTs(marathon::ResourceManager& resource_manager,
 void MergePICTs(marathon::ResourceManager& resource_manager,
 				const fs::path& path)
 {
-	std::vector<fs::path> dir = path.ls();
-	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
+	for (const auto& dir_entry : fs::directory_iterator{path})
 	{
-		if (!it->is_directory())
+		if (dir_entry.is_regular_file())
 		{
-			std::istringstream s(it->filename());
+			std::istringstream s(dir_entry.path().filename());
 			int16 index;
 			s >> index;
 			if (!s.fail())
 			{
 				PICTResource pict;
-				if (pict.Import(it->string()))
+				if (pict.Import(dir_entry.path()))
 				{
 					resource_manager.resource_map()[std::make_pair(FOUR_CHARS_TO_INT('P','I','C','T'), index)] = pict.Save();
 				}
@@ -320,18 +309,17 @@ void MergePICTs(marathon::ResourceManager& resource_manager,
 
 void MergeSnds(marathon::ResourceManager& resource_manager, const fs::path& path)
 {
-	std::vector<fs::path> dir = path.ls();
-	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
+	for (const auto& dir_entry : fs::directory_iterator{path})
 	{
-		if (!it->is_directory())
+		if (dir_entry.is_regular_file())
 		{
-			std::istringstream s(it->filename());
+			std::istringstream s(dir_entry.path().filename());
 			int16 index;
 			s >> index;
 			if (!s.fail())
 			{
 				SndResource snd;
-				if (snd.Import(it->string()))
+				if (snd.Import(dir_entry.path()))
 				{
 					resource_manager.resource_map()[std::make_pair(FOUR_CHARS_TO_INT('s','n','d',' '), index)] = snd.Save();
 				}
@@ -343,17 +331,16 @@ void MergeSnds(marathon::ResourceManager& resource_manager, const fs::path& path
 void MergeTEXTs(marathon::ResourceManager& resource_manager,
 				const fs::path& path)
 {
-	std::vector<fs::path> dir = path.ls();
-	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
+	for (const auto& dir_entry : fs::directory_iterator{path})
 	{
-		if (!it->is_directory())
+		if (dir_entry.is_regular_file())
 		{
-			std::istringstream s(it->filename());
+			std::istringstream s(dir_entry.path().filename());
 			int16 index;
 			s >> index;
 			if (!s.fail())
 			{
-				resource_manager.resource_map()[std::make_pair(FOUR_CHARS_TO_INT('T','E','X','T'), index)] = ReadFile(it->string());
+				resource_manager.resource_map()[std::make_pair(FOUR_CHARS_TO_INT('T','E','X','T'), index)] = ReadFile(dir_entry);
 			}
 		}
 	}	
@@ -362,26 +349,26 @@ void MergeTEXTs(marathon::ResourceManager& resource_manager,
 void MergeResources(marathon::ResourceManager& resource_manager,
 					const fs::path& path)
 {
-	std::vector<fs::path> dir = path.ls();
-	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
+	for (const auto& dir_entry : fs::directory_iterator{path})
 	{
-		if (it->is_directory())
+		if (dir_entry.is_directory())
 		{
-			if (it->filename() == "TEXT")
+			auto filename = dir_entry.path().filename();
+			if (filename == "TEXT")
 			{
-				MergeTEXTs(resource_manager, *it);
+				MergeTEXTs(resource_manager, dir_entry);
 			}
-			else if (it->filename() == "CLUT")
+			else if (filename == "CLUT")
 			{
-				MergeCLUTs(resource_manager, *it);
+				MergeCLUTs(resource_manager, dir_entry);
 			}
-			else if (it->filename() == "PICT")
+			else if (filename == "PICT")
 			{
-				MergePICTs(resource_manager, *it);
+				MergePICTs(resource_manager, dir_entry);
 			}
-			else if (it->filename() == "snd")
+			else if (filename == "snd")
 			{
-				MergeSnds(resource_manager, *it);
+				MergeSnds(resource_manager, dir_entry);
 			}
 		}
 	}
@@ -414,11 +401,11 @@ static std::string get_line(std::istream& stream)
 }
 
 
-void atque::merge(const std::string& src, const std::string& dest, std::ostream& log)
+void atque::merge(const fs::path& src, const fs::path& dest, std::ostream& log)
 {
 	if (!fs::exists(src))
 	{
-		throw merge_error(src + " does not exist");
+		throw merge_error(src.string() + " does not exist");
 	}
 	else if (!fs::is_directory(src))
 	{
@@ -432,7 +419,7 @@ void atque::merge(const std::string& src, const std::string& dest, std::ostream&
 	level_select_path = level_select_path / "Level Select Names.txt";
 	
 	std::map<int16, std::string> level_select_names;
-	if (level_select_path.exists())
+	if (fs::exists(level_select_path))
 	{
 		std::ifstream s(level_select_path.string().c_str());
 		while (!s.eof() && !s.fail())
@@ -447,18 +434,17 @@ void atque::merge(const std::string& src, const std::string& dest, std::ostream&
 		}
 	}
 
-	std::vector<fs::path> dir = fs::path(src).ls();
-	for (std::vector<fs::path>::iterator it = dir.begin(); it != dir.end(); ++it)
+	for (const auto& dir_entry : fs::directory_iterator{src})
 	{
-		if (it->is_directory())
+		if (dir_entry.is_directory())
 		{
-			if (it->filename() == "Resources")
+			if (dir_entry.path().filename() == "Resources")
 			{
-				MergeResources(resource_manager, *it);
+				MergeResources(resource_manager, dir_entry);
 			}
 			else
 			{
-				std::istringstream s(it->filename());
+				std::istringstream s(dir_entry.path().filename());
 				int16 index;
 				s >> index;
 				if (!s.fail())
@@ -470,7 +456,7 @@ void atque::merge(const std::string& src, const std::string& dest, std::ostream&
 					{
 						std::string level_name;
 						std::getline(s, level_name);
-						wadfile.SetWad(index, CreateWad(*it, log));
+						wadfile.SetWad(index, CreateWad(dir_entry, log));
 					} 
 				}
 			}
@@ -485,7 +471,7 @@ void atque::merge(const std::string& src, const std::string& dest, std::ostream&
 		}
 	}
 
-	wadfile.file_name(fs::basename(fs::path(dest).filename()));
+	wadfile.file_name(utf8_to_mac_roman(fs::path(dest).stem().u8string()));
 
 	if (resource_manager.CanSaveToResourceFork())
 	{

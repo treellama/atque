@@ -1050,18 +1050,17 @@ std::vector<uint8> PICTResource::Save() const
 	}
 }
 
-bool PICTResource::Import(const std::string& path)
+bool PICTResource::Import(const std::filesystem::path& path)
 {
 	data_.clear();
 	jpeg_.clear();
-	if (algo::iends_with(path, ".bmp"))
+	if (path.extension() == ".bmp")
 	{
 		bitmap_.ReadFromFile(path.c_str());
 	}
-	else if (algo::iends_with(path, ".jpg"))
+	else if (path.extension() == ".jpg")
 	{
-		std::ifstream infile(path.c_str(), std::ios::binary);
-		infile.seekg(0, std::ios::end);
+		std::ifstream infile(path, std::ios::binary | std::ios::ate);
 		std::streamsize length = infile.tellg();
 		
 		infile.seekg(0);
@@ -1070,8 +1069,7 @@ bool PICTResource::Import(const std::string& path)
 	}
 	else
 	{
-		std::ifstream infile(path.c_str(), std::ios::binary);
-		infile.seekg(0, std::ios::end);
+		std::ifstream infile(path, std::ios::binary | std::ios::ate);
 		std::streamsize length = infile.tellg();
 		
 		if (length < 528) return false;
@@ -1084,23 +1082,25 @@ bool PICTResource::Import(const std::string& path)
 	return true;
 }
 
-void PICTResource::Export(const std::string& path)
+void PICTResource::Export(const std::filesystem::path& path)
 {
 	if (bitmap_.TellHeight() != 1 || bitmap_.TellWidth() != 1)
 	{
-		std::string bmp_path = path + ".bmp";
+		std::string bmp_path = path.string() + ".bmp";
 		bitmap_.WriteToFile(bmp_path.c_str());
 	}
 	else if (jpeg_.size())
 	{
-		std::string jpeg_path = path + ".jpg";
-		std::ofstream outfile(jpeg_path.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+		auto jpeg_path = path;
+		jpeg_path += ".jpg";
+		std::ofstream outfile(jpeg_path, std::ios::trunc | std::ios::binary);
 		outfile.write(reinterpret_cast<const char *>(&jpeg_[0]), jpeg_.size());
 	}
 	else
 	{
-		std::string pict_path = path + ".pct";
-		std::ofstream outfile(pict_path.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+		auto pict_path = path;
+		pict_path += ".pct";
+		std::ofstream outfile(pict_path, std::ios::trunc | std::ios::binary);
 		for (int i = 0; i < 512; ++i)
 		{
 			outfile.put('\0');

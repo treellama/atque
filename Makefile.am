@@ -23,14 +23,14 @@ else
 bin_PROGRAMS=atques atquem
 endif
 
-atques_SOURCES=atques.cpp split.cpp split.h filesystem.h $(RESOURCE_SRCS) 
+atques_SOURCES=atques.cpp split.cpp split.h $(RESOURCE_SRCS) 
 atques_LDADD = ferro/libferro.a
 
-atquem_SOURCES=atquem.cpp merge.cpp merge.h filesystem.h $(RESOURCE_SRCS)
+atquem_SOURCES=atquem.cpp merge.cpp merge.h $(RESOURCE_SRCS)
 atquem_LDADD = ferro/libferro.a
 
 if BUILD_ATQUEGUI
-ATQUE_SOURCES=atque.h atque.cpp split.cpp split.h merge.cpp merge.h filesystem.h $(RESOURCE_SRCS)
+ATQUE_SOURCES=atque.h atque.cpp split.cpp split.h merge.cpp merge.h $(RESOURCE_SRCS)
 if MAKE_WINDOWS
 atque-resources.o:
 	@WX_RESCOMP@ -o atque-resources.o -I$(srcdir) $(srcdir)/atque.rc

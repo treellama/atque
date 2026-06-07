@@ -24,6 +24,7 @@
 #include "ferro/cstypes.h"
 
 #include <stdexcept>
+#include <filesystem>
 #include <vector>
 
 class AIStreamBE;
@@ -150,8 +151,8 @@ namespace marathon
 		};
 
 		void Load(const std::vector<uint8>&);
-		void Decompile(const std::string& path) const;
-		void Compile(const std::string& path);
+		void Decompile(const std::filesystem::path& path) const;
+		void Compile(const std::filesystem::path& path);
 		std::vector<uint8> Save() const;
 
 	private:

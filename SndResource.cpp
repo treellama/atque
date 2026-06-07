@@ -206,10 +206,14 @@ private:
 
 };
 
-bool SndResource::Import(const std::string& path)
+bool SndResource::Import(const std::filesystem::path& path)
 {
 	SF_INFO inputInfo;
-	SNDFILE *infile = sf_open(path.c_str(), SFM_READ, &inputInfo);
+#ifdef __WIN32__
+	SNDFILE *infile = sf_open_wchar(path.wstring().c_str(), SFM_READ, &inputInfo);
+#else
+	SNDFILE *infile = sf_open(path.u8string().c_str(), SFM_READ, &inputInfo);
+#endif
 	if (!infile) return false;
 
 	sixteen_bit_ = !(inputInfo.format & (SF_FORMAT_PCM_S8 | SF_FORMAT_PCM_U8));
@@ -270,7 +274,7 @@ bool SndResource::Import(const std::string& path)
 	return true;
 }
 
-void SndResource::Export(const std::string& path) const
+void SndResource::Export(const std::filesystem::path& path) const
 {
 	// open an output file
 
@@ -292,8 +296,12 @@ void SndResource::Export(const std::string& path) const
 	outputInfo.samplerate = static_cast<int32>(rate_ >> 16);
 	outputInfo.channels = stereo_ ? 2 : 1;
 	outputInfo.format = SF_FORMAT_WAV | outputFormat;
-	
-	SNDFILE *outfile = sf_open(path.c_str(), SFM_WRITE, &outputInfo);
+
+#ifdef __WIN32__
+	SNDFILE *outfile = sf_wchar_open(path.wstring().c_str(), SFM_WRITE, &outputInfo);
+#else
+	SNDFILE *outfile = sf_open(path.u8string().c_str(), SFM_WRITE, &outputInfo);
+#endif
 
 
 	SF_VIRTUAL_IO virtual_io = {

@@ -23,6 +23,7 @@
 
 #include "ferro/cstypes.h"
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -36,8 +37,8 @@ namespace atque
 		void Load(const std::vector<uint8>&);
 		std::vector<uint8> Save() const;
 
-		bool Import(const std::string& path);
-		void Export(const std::string& path) const;
+		bool Import(const std::filesystem::path& path);
+		void Export(const std::filesystem::path& path) const;
 
 	private:
 		struct Color
