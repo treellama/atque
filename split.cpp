@@ -460,6 +460,18 @@ void atque::split(const fs::path& src, const fs::path& dest, std::ostream& log)
 			SndResource snd(res_data);
 			snd.Export(snd_path.string());
 		}
+		else
+		{
+			std::ostringstream oss;
+			oss << std::hex << std::setw(8) << std::setfill('0') << res_type;
+			auto res_dir = resource_path / oss.str();
+			
+			fs::create_directory(res_dir);
+			
+			fs::path res_path = res_dir / (id.str() + ".bin");
+			std::ofstream stream{res_path.string(), std::ios_base::binary | std::ios_base::trunc};
+			stream.write(reinterpret_cast<const char*>(res_data.data()), res_data.size());
+		}
 	}
 
 	if (level_select_names.size())

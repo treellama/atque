@@ -346,6 +346,29 @@ void MergeTEXTs(marathon::ResourceManager& resource_manager,
 	}	
 }
 
+void MergeResourceDir(marathon::ResourceManager& resource_manager,
+					  const fs::path& path)
+{
+	try
+	{
+		uint32_t res_type = std::stoul(path.filename(), nullptr, 16);
+		for (const auto& dir_entry : fs::directory_iterator{path})
+		{
+			std::istringstream s(dir_entry.path().filename());
+			int16_t index;
+			s >> index;
+			if (!s.fail())
+			{
+				resource_manager.resource_map()[std::make_pair(res_type, index)] = ReadFile(dir_entry);
+			}
+		}
+	}
+	catch (const std::exception&)
+	{
+		
+	}
+}
+
 void MergeResources(marathon::ResourceManager& resource_manager,
 					const fs::path& path)
 {
@@ -369,6 +392,10 @@ void MergeResources(marathon::ResourceManager& resource_manager,
 			else if (filename == "snd")
 			{
 				MergeSnds(resource_manager, dir_entry);
+			}
+			else
+			{
+				MergeResourceDir(resource_manager, dir_entry);
 			}
 		}
 	}
@@ -400,7 +427,6 @@ static std::string get_line(std::istream& stream)
 	return line;
 }
 
-
 void atque::merge(const fs::path& src, const fs::path& dest, std::ostream& log)
 {
 	if (!fs::exists(src))
@@ -412,8 +438,32 @@ void atque::merge(const fs::path& src, const fs::path& dest, std::ostream& log)
 		throw merge_error("source must be a directory");
 	}
 
-	marathon::Wadfile wadfile;
 	marathon::ResourceManager resource_manager;
+
+	if (fs::exists(src / "Data.bin"))
+	{
+		MergeResources(resource_manager, src / "Resources");
+		if (resource_manager.CanSaveToResourceFork())
+		{
+			resource_manager.Save(dest, [&](std::ostream& stream) {
+				std::ifstream data_fork{src / "Data.bin",
+										std::ios::binary | std::ios::ate};
+				auto length = data_fork.tellg();
+				data_fork.seekg(0, std::ios::beg);
+
+				std::vector<uint8_t> data(length);
+				data_fork.read(reinterpret_cast<char*>(data.data()), data.size());
+				stream.write(reinterpret_cast<char*>(data.data()), data.size());
+			});
+			return;
+		}
+		else
+		{
+			throw merge_error("merge folders with a raw data fork must contain a Resources directory");
+		}
+	}
+
+	marathon::Wadfile wadfile;
 	
 	fs::path level_select_path(src);
 	level_select_path = level_select_path / "Level Select Names.txt";
