@@ -346,6 +346,56 @@ void MergeTEXTs(marathon::ResourceManager& resource_manager,
 	}	
 }
 
+static std::vector<uint8_t> convert_m1_term(const std::string& m1_term)
+{
+	auto in = utf8_to_mac_roman(m1_term);
+	std::vector<uint8_t> out;
+
+	char prev = 0;
+	for (auto c : in)
+	{
+		if (c == '\n')
+		{
+			if (prev != '\r')
+			{
+				out.push_back('\r');
+			}
+		}
+		else
+		{
+			out.push_back(c);
+		}
+		prev = c;
+	}
+
+	return out;
+}
+
+void MergeM1Terms(marathon::ResourceManager& resource_manager,
+				  const fs::path& path)
+{
+	for (const auto& dir_entry : fs::directory_iterator{path})
+	{
+		if (dir_entry.is_regular_file())
+		{
+			std::istringstream s(dir_entry.path().filename());
+			int16 index;
+			s >> index;
+			if (!s.fail())
+			{
+				std::ifstream infile{dir_entry.path(), std::ios::ate};
+				auto length = infile.tellg();
+				infile.seekg(0);
+
+				std::string m1_term(length, '\0');
+				infile.read(m1_term.data(), m1_term.size());
+
+				resource_manager.resource_map()[std::make_pair(FOUR_CHARS_TO_INT('t','e','r','m'), index)] = convert_m1_term(m1_term);
+			}
+		}
+	}
+}
+
 void MergeResourceDir(marathon::ResourceManager& resource_manager,
 					  const fs::path& path)
 {
@@ -392,6 +442,10 @@ void MergeResources(marathon::ResourceManager& resource_manager,
 			else if (filename == "snd")
 			{
 				MergeSnds(resource_manager, dir_entry);
+			}
+			else if (filename == "term")
+			{
+				MergeM1Terms(resource_manager, dir_entry);
 			}
 			else
 			{

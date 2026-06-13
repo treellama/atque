@@ -211,6 +211,32 @@ void SaveTEXT(const std::vector<uint8_t>& data, const fs::path& path)
 	}
 }
 
+void SaveM1Term(const std::vector<uint8_t>& data, const fs::path& path)
+{
+	if (data.size())
+	{
+		std::ofstream outfile(path, std::ios::trunc);
+		std::string line;
+		for (auto c : data)
+		{
+			if (c == '\r')
+			{
+				outfile << mac_roman_to_utf8(line);
+				line.clear();
+#ifdef __WIN32__
+				outfile << "\r\n";
+#else
+				outfile << "\n";
+#endif
+			}
+			else
+			{
+				line += static_cast<char>(c);
+			}
+		}
+	}
+}
+
 void SaveTerminal(marathon::Wad& wad, const fs::path& path)
 {
 	if (wad.HasChunk(marathon::TerminalChunk::kTag))
@@ -459,6 +485,14 @@ void atque::split(const fs::path& src, const fs::path& dest, std::ostream& log)
 			auto snd_path = snd_dir / (id.str() + ".wav");
 			SndResource snd(res_data);
 			snd.Export(snd_path.string());
+		}
+		else if (res_type == FOUR_CHARS_TO_INT('t','e','r','m'))
+		{
+			auto term_dir = resource_path / "term";
+			fs::create_directory(term_dir);
+
+			auto term_path = term_dir / (id.str() + ".txt");
+			SaveM1Term(res_data, term_path);
 		}
 		else
 		{
