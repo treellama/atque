@@ -111,6 +111,14 @@ bool ResourceManager::Load(const std::filesystem::path& path,
 	return true;
 }
 
+static uint32_t file_type_from_extension(const std::string& extension)
+{
+	return FOUR_CHARS_TO_INT(extension.at(1),
+							 extension.at(2),
+							 extension.at(3),
+							 extension.at(4));
+}
+
 void ResourceManager::Save(const std::filesystem::path& path,
 						   write_data_cb write_data_fork)
 {
@@ -118,23 +126,34 @@ void ResourceManager::Save(const std::filesystem::path& path,
 
 	header.macbinary_version = 129;
 	header.min_macbinary_version = 129;
-	// TODO: creation date? file creator? modification date?
+	header.creation_date = std::chrono::seconds(std::time(nullptr)).count() + 2082844800UL;
+	header.last_modified_date = header.creation_date;
+
 	auto filename = utf8_to_mac_roman(path.stem().u8string());
 	header.filename_length = std::max(static_cast<size_t>(header.max_filename_length),
 									  filename.size());
 	std::copy_n(filename.begin(), header.filename_length, header.filename);
 
 	auto extension = utf8_to_mac_roman(path.extension().u8string());
-	if (extension.size() == 4)
+	if (extension == ".appl")
 	{
-		header.file_type = FOUR_CHARS_TO_INT(extension[0],
-											 extension[1],
-											 extension[2],
-											 extension[3]);
+		header.file_creator = FOUR_CHARS_TO_INT('2','6','.','2');
+		header.file_type = FOUR_CHARS_TO_INT('A','P','P','L');
 	}
-	else
+	else if (extension == ".sndz" || extension == ".shps")
 	{
-		// TODO?
+		header.file_creator = FOUR_CHARS_TO_INT('2','6','.','2');
+		header.file_type = file_type_from_extension(extension);
+	}
+	else if (extension.size() == 5)
+	{
+		header.file_creator = FOUR_CHARS_TO_INT('2','6','.','A');
+		header.file_type = file_type_from_extension(extension);
+	}
+	else 
+	{
+		header.file_creator = FOUR_CHARS_TO_INT('2','6','.','A');
+		header.file_type = FOUR_CHARS_TO_INT('?','?','?','?');
 	}
 	
 	std::ofstream stream{path, std::ios::out | std::ios::binary | std::ios::trunc};
