@@ -20,6 +20,7 @@
 
 #include "ResourceManager.h"
 
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <set>
@@ -360,7 +361,7 @@ void ResourceManager::SaveResourceFork(std::ostream& stream)
 			if (name_it != name_map_.end())
 			{
 				ref_list_entry.name_list_offset = name_list_offset;
-				name_list_offset += 1 + std::min(name_it->second.size(), 255UL);
+				name_list_offset += 1 + std::min(name_it->second.size(), static_cast<size_t>(255UL));
 			}
 			else
 			{
@@ -422,7 +423,7 @@ void ResourceManager::SaveResourceFork(std::ostream& stream)
 			if (name_it != name_map_.end())
 			{
 				auto& name = name_it->second;
-				uint8_t length = std::min(name.size(), 255UL);
+				uint8_t length = std::min(name.size(), static_cast<size_t>(255UL));
 				stream.put(length);
 				stream.write(name.data(), length);
 			}

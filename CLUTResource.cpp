@@ -132,7 +132,7 @@ bool CLUTResource::Import(const std::filesystem::path& path)
 	else if (path.extension() == ".bmp")
 	{
 		BMP bitmap;
-		if (bitmap.ReadFromFile(path.c_str()) && bitmap.TellNumberOfColors() <= 256)
+		if (bitmap.ReadFromFile(path.string().c_str()) && bitmap.TellNumberOfColors() <= 256)
 		{
 			colors_.resize(256);
 			for (int i = 0; i < bitmap.TellNumberOfColors(); ++i)

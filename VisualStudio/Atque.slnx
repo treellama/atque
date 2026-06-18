@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Atque.vcxproj" Id="bf5686b8-6a1c-4840-bd99-639784440f0f" />
+</Solution>

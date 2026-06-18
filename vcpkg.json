@@ -11,6 +11,9 @@
 		{
 			"name":"boost-crc"
 		},
+		{
+			"name":"boost-endian"
+		},
         {
             "name":"libsndfile",
             "default-features": false
@@ -19,5 +22,11 @@
             "name":"wxwidgets"
         }
     ],
-    "builtin-baseline":"08214e18eeb146542944067c35d77faca8962be5"
+    "builtin-baseline":"c3867e714dd3a51c272826eea77267876517ed99",
+	"overrides": [
+		{
+			"name": "wxwidgets",
+			"version": "3.2.10"
+		}
+	]
 }

@@ -85,7 +85,7 @@ const std::vector<uint32> physics_chunks = boost::assign::list_of
 	;
 
 // removes physics chunks from wad, and saves file
-void SavePhysics(marathon::Wad& wad, const std::string& name, const std::string& path)
+void SavePhysics(marathon::Wad& wad, const std::string& name, const fs::path& path)
 {
 	marathon::Wad physicsWad;
 	bool has_physics = false;
@@ -108,7 +108,7 @@ void SavePhysics(marathon::Wad& wad, const std::string& name, const std::string&
 		wadfile.data_version(0);
 		wadfile.file_name(name);
 		wadfile.Save(path);
-		set_type_code(path, "phy\260");
+		set_type_code(path.string(), "phy\260");
 	}
 }
 
@@ -119,7 +119,7 @@ void SaveLevel(marathon::Wad& wad, const std::string& name, const fs::path& path
 	wadfile.SetWad(0, wad);
 	wadfile.file_name(name);
 	wadfile.Save(path);
-	set_type_code(path, "sce2");
+	set_type_code(path.string(), "sce2");
 }
 
 // removes shapes chunk from Wad, and saves file
@@ -133,7 +133,7 @@ void SaveShapes(marathon::Wad& wad, const fs::path& path)
 		{
 			std::ofstream outfile(path, std::ios::trunc | std::ios::binary);
 			outfile.write(reinterpret_cast<const char*>(&data[0]), data.size());
-			set_type_code(path, "ShPa");
+			set_type_code(path.string(), "ShPa");
 		}
 		wad.RemoveChunk(shapes_tag);
 	}
@@ -149,7 +149,7 @@ void SaveSounds(marathon::Wad& wad, const fs::path& path)
 		{
 			std::ofstream outfile(path, std::ios::trunc | std::ios::binary);
 			outfile.write(reinterpret_cast<const char*>(data.data()), data.size());
-			set_type_code(path, "SnPa");
+			set_type_code(path.string(), "SnPa");
 		}
 		wad.RemoveChunk(sounds_tag);
 	}

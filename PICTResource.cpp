@@ -1056,7 +1056,7 @@ bool PICTResource::Import(const std::filesystem::path& path)
 	jpeg_.clear();
 	if (path.extension() == ".bmp")
 	{
-		bitmap_.ReadFromFile(path.c_str());
+		bitmap_.ReadFromFile(path.string().c_str());
 	}
 	else if (path.extension() == ".jpg")
 	{

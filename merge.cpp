@@ -149,7 +149,7 @@ void MergeScripts(const std::vector<fs::path> paths, marathon::Wad& wad, uint32 
 	for (std::vector<fs::path>::const_iterator it = paths.begin(); it != paths.end(); ++it)
 	{
 		marathon::ScriptChunk::Script script;
-		script.name = it->stem();
+		script.name = it->stem().string();
 		script.data = ReadFile(*it);
 		chunk.AddScript(script);
 	}
@@ -270,7 +270,7 @@ void MergeCLUTs(marathon::ResourceManager& resource_manager,
 	{
 		if (dir_entry.is_regular_file())
 		{
-			std::istringstream s(dir_entry.path().filename());
+			std::istringstream s(dir_entry.path().filename().string());
 			int16 index;
 			s >> index;
 			if (!s.fail())
@@ -292,7 +292,7 @@ void MergePICTs(marathon::ResourceManager& resource_manager,
 	{
 		if (dir_entry.is_regular_file())
 		{
-			std::istringstream s(dir_entry.path().filename());
+			std::istringstream s(dir_entry.path().filename().string());
 			int16 index;
 			s >> index;
 			if (!s.fail())
@@ -313,7 +313,7 @@ void MergeSnds(marathon::ResourceManager& resource_manager, const fs::path& path
 	{
 		if (dir_entry.is_regular_file())
 		{
-			std::istringstream s(dir_entry.path().filename());
+			std::istringstream s(dir_entry.path().filename().string());
 			int16 index;
 			s >> index;
 			if (!s.fail())
@@ -335,7 +335,7 @@ void MergeTEXTs(marathon::ResourceManager& resource_manager,
 	{
 		if (dir_entry.is_regular_file())
 		{
-			std::istringstream s(dir_entry.path().filename());
+			std::istringstream s(dir_entry.path().filename().string());
 			int16 index;
 			s >> index;
 			if (!s.fail())
@@ -378,7 +378,7 @@ void MergeM1Terms(marathon::ResourceManager& resource_manager,
 	{
 		if (dir_entry.is_regular_file())
 		{
-			std::istringstream s(dir_entry.path().filename());
+			std::istringstream s(dir_entry.path().filename().string());
 			int16 index;
 			s >> index;
 			if (!s.fail())
@@ -404,7 +404,7 @@ void MergeResourceDir(marathon::ResourceManager& resource_manager,
 		uint32_t res_type = std::stoul(path.filename(), nullptr, 16);
 		for (const auto& dir_entry : fs::directory_iterator{path})
 		{
-			std::istringstream s(dir_entry.path().filename());
+			std::istringstream s(dir_entry.path().filename().string());
 			int16_t index;
 			s >> index;
 			if (!s.fail())
@@ -548,7 +548,7 @@ void atque::merge(const fs::path& src, const fs::path& dest, std::ostream& log)
 			}
 			else
 			{
-				std::istringstream s(dir_entry.path().filename());
+				std::istringstream s(dir_entry.path().filename().string());
 				int16 index;
 				s >> index;
 				if (!s.fail())
