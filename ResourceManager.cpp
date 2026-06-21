@@ -378,17 +378,40 @@ void ResourceManager::SaveResourceFork(std::ostream& stream)
 		}
 	}
 
+	static constexpr int reserved = 240;
+
 	ResourceHeader header{};
-	header.map_offset = sizeof(ResourceHeader);
+	header.data_offset = sizeof(ResourceHeader) + reserved;
+	header.data_length = data_offset;
+
+	header.map_offset = header.data_offset + header.data_length;
 	header.map_length = sizeof(ResourceMap) +
 						type_list.size() * sizeof(TypeListEntry) +
 						ref_list.size() * sizeof(RefListEntry) +
 						name_list_offset;
 	
-	header.data_offset = header.map_offset + header.map_length;
-	header.data_length = data_offset;
-
 	stream.write(reinterpret_cast<char*>(&header), sizeof(ResourceHeader));
+	for (auto i = 0; i < reserved; ++i)
+	{
+		stream.put(0);
+	}
+
+	assert(stream.tellp() - fork_start == header.data_offset);
+
+	for (auto& [res_type, set] : res_set)
+	{
+		for (auto& res_id : set)
+		{
+			auto& data = resource_map_[std::make_pair(res_type, res_id)];
+			big_uint32_t data_length = data.size();
+
+			stream.write(reinterpret_cast<char*>(&data_length),
+						 sizeof(data_length));
+			stream.write(reinterpret_cast<char*>(data.data()), data.size());
+		}
+	}
+
+	assert(stream.tellp() - fork_start == header.data_offset + header.data_length);
 
 	auto map_start = stream.tellp();
 
@@ -431,20 +454,5 @@ void ResourceManager::SaveResourceFork(std::ostream& stream)
 		}
 	}
 
-	assert(stream.tellp() - fork_start == header.data_offset);
-
-	for (auto& [res_type, set] : res_set)
-	{
-		for (auto& res_id : set)
-		{
-			auto& data = resource_map_[std::make_pair(res_type, res_id)];
-			big_uint32_t data_length = data.size();
-
-			stream.write(reinterpret_cast<char*>(&data_length),
-						 sizeof(data_length));
-			stream.write(reinterpret_cast<char*>(data.data()), data.size());
-		}
-	}
-
-	assert(stream.tellp() - fork_start == header.data_offset + header.data_length);
+	
 }
