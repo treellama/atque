@@ -129,9 +129,10 @@ void ResourceManager::Save(const std::filesystem::path& path,
 	header.min_macbinary_version = 129;
 	header.creation_date = std::chrono::seconds(std::time(nullptr)).count() + 2082844800UL;
 	header.last_modified_date = header.creation_date;
+	header.original_finder_flags = 0x01;
 
 	auto filename = utf8_to_mac_roman(path.stem().u8string());
-	header.filename_length = std::max(static_cast<size_t>(header.max_filename_length),
+	header.filename_length = std::min(static_cast<size_t>(header.max_filename_length),
 									  filename.size());
 	std::copy_n(filename.begin(), header.filename_length, header.filename);
 
@@ -157,7 +158,7 @@ void ResourceManager::Save(const std::filesystem::path& path,
 		header.file_type = FOUR_CHARS_TO_INT('?','?','?','?');
 	}
 	
-	std::ofstream stream{path, std::ios::out | std::ios::binary | std::ios::trunc};
+	std::ofstream stream{path, std::ios::binary | std::ios::trunc};
 	stream.seekp(sizeof(MacBinaryII));
 
 	write_data_fork(stream);
