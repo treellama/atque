@@ -436,13 +436,15 @@ void atque::split(const fs::path& src, const fs::path& dest, std::ostream& log)
 		std::ostringstream id;
 		id << std::setw(5) << std::setfill('0') << res_index;
 
+		std::filesystem::path res_dir;
+
 		if (res_type == FOUR_CHARS_TO_INT('P','I','C','T') ||
 			res_type == FOUR_CHARS_TO_INT('p','i','c','t'))
 		{
-			auto pict_dir = resource_path / "PICT";
-			fs::create_directory(pict_dir);
+			res_dir = resource_path / "PICT";
+			fs::create_directory(res_dir);
 			
-			auto pict_path = pict_dir / id.str(); 
+			auto pict_path = res_dir / id.str(); 
 			PICTResource pict;
 			if (res_type == FOUR_CHARS_TO_INT('P','I','C','T'))
 			{
@@ -462,49 +464,61 @@ void atque::split(const fs::path& src, const fs::path& dest, std::ostream& log)
 		else if (res_type == FOUR_CHARS_TO_INT('T','E','X','T') ||
 				 res_type == FOUR_CHARS_TO_INT('t','e','x','t'))
 		{
-			auto text_dir = resource_path / "TEXT";
-			fs::create_directory(text_dir);
+			res_dir = resource_path / "TEXT";
+			fs::create_directory(res_dir);
 
-			auto text_path = text_dir / (id.str() + ".txt");
+			auto text_path = res_dir / (id.str() + ".txt");
 			SaveTEXT(res_data, text_path.string());
 		}
 		else if (res_type == FOUR_CHARS_TO_INT('c','l','u','t'))
 		{
-			auto clut_dir = resource_path / "CLUT";
-			fs::create_directory(clut_dir);
+			res_dir = resource_path / "CLUT";
+			fs::create_directory(res_dir);
 			
-			auto clut_path = clut_dir / (id.str() + ".act");
+			auto clut_path = res_dir / (id.str() + ".act");
 			CLUTResource clut(res_data);
 			clut.Export(clut_path.string());
 		}
 		else if (res_type == FOUR_CHARS_TO_INT('s','n','d',' '))
 		{
-			auto snd_dir = resource_path / "snd";
-			fs::create_directory(snd_dir);
+			res_dir = resource_path / "snd";
+			fs::create_directory(res_dir);
 			
-			auto snd_path = snd_dir / (id.str() + ".wav");
+			auto snd_path = res_dir / (id.str() + ".wav");
 			SndResource snd(res_data);
 			snd.Export(snd_path.string());
 		}
 		else if (res_type == FOUR_CHARS_TO_INT('t','e','r','m'))
 		{
-			auto term_dir = resource_path / "term";
-			fs::create_directory(term_dir);
+			res_dir = resource_path / "term";
+			fs::create_directory(res_dir);
 
-			auto term_path = term_dir / (id.str() + ".txt");
+			auto term_path = res_dir / (id.str() + ".txt");
 			SaveM1Term(res_data, term_path);
 		}
 		else
 		{
 			std::ostringstream oss;
 			oss << std::hex << std::setw(8) << std::setfill('0') << res_type;
-			auto res_dir = resource_path / oss.str();
+			res_dir = resource_path / oss.str();
 			
 			fs::create_directory(res_dir);
 			
 			fs::path res_path = res_dir / (id.str() + ".bin");
 			std::ofstream stream{res_path.string(), std::ios_base::binary | std::ios_base::trunc};
 			stream.write(reinterpret_cast<const char*>(res_data.data()), res_data.size());
+		}
+
+		auto name_it = resource_manager.name_map().find(res_id);
+		if (name_it != resource_manager.name_map().end())
+		{
+			std::ofstream resource_name_file{res_dir / "Resource Names.txt",
+											 std::ios::app};
+#ifdef __WIN32__
+			resource_name_file << id.str() << " " << mac_roman_to_utf8(name_it->second) << "\r\n";
+#else
+			resource_name_file << id.str() << " " << mac_roman_to_utf8(name_it->second) << "\n";
+#endif
 		}
 	}
 

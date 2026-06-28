@@ -68,6 +68,54 @@ static std::vector<uint8> ReadFile(const fs::path& path)
 	return data;
 }
 
+static std::string get_line(std::istream& stream)
+{
+	std::string line;
+	char c;
+	stream.get(c);
+	while (!stream.eof() && c != '\n' && c != '\r')
+	{
+		if (c == '\r')
+		{
+			if (!stream.eof() && stream.peek() == '\n')
+			{
+				stream.ignore(1);
+			}
+		}
+		else if (c != '\n' && c != '\0')
+		{
+			line += c;
+		}
+
+		stream.get(c);
+
+	};
+
+	return line;
+}
+
+static std::map<int16_t, std::string> ReadNames(const fs::path& path)
+{
+	std::map<int16_t, std::string> names;
+
+	if (fs::exists(path))
+	{
+		std::ifstream s(path);
+		while (!s.eof() && !s.fail())
+		{
+			int16_t index;
+			s >> index;
+			if (!s.fail())
+			{
+				s.ignore();
+				names[index] = get_line(s);
+			}
+		}
+	}
+
+	return names;
+}
+
 void MergePhysics(const fs::path& path, marathon::Wad& wad, std::ostream& log)
 {
 	marathon::Wadfile wadfile;
@@ -266,6 +314,7 @@ marathon::Wad CreateWad(const fs::path& path, std::ostream& log)
 void MergeCLUTs(marathon::ResourceManager& resource_manager,
 				const fs::path& path)
 {
+	auto names = ReadNames(path / "Resource Names.txt");
 	for (const auto& dir_entry : fs::directory_iterator{path})
 	{
 		if (dir_entry.is_regular_file())
@@ -278,7 +327,13 @@ void MergeCLUTs(marathon::ResourceManager& resource_manager,
 				CLUTResource clut;
 				if (clut.Import(dir_entry.path()))
 				{
-					resource_manager.resource_map()[std::make_pair(FOUR_CHARS_TO_INT('c','l','u','t'), index)] = clut.Save();
+					auto res_id = std::make_pair(FOUR_CHARS_TO_INT('c','l','u','t'), index);
+					resource_manager.resource_map()[res_id] = clut.Save();
+
+					if (auto name_it = names.find(index); name_it != names.end())
+					{
+						resource_manager.name_map()[res_id] = utf8_to_mac_roman(name_it->second);
+					}
 				}
 			}
 		}
@@ -288,6 +343,7 @@ void MergeCLUTs(marathon::ResourceManager& resource_manager,
 void MergePICTs(marathon::ResourceManager& resource_manager,
 				const fs::path& path)
 {
+	auto names = ReadNames(path / "Resource Names.txt");
 	for (const auto& dir_entry : fs::directory_iterator{path})
 	{
 		if (dir_entry.is_regular_file())
@@ -300,7 +356,12 @@ void MergePICTs(marathon::ResourceManager& resource_manager,
 				PICTResource pict;
 				if (pict.Import(dir_entry.path()))
 				{
-					resource_manager.resource_map()[std::make_pair(FOUR_CHARS_TO_INT('P','I','C','T'), index)] = pict.Save();
+					auto res_id = std::make_pair(FOUR_CHARS_TO_INT('P','I','C','T'), index);
+					resource_manager.resource_map()[res_id] = pict.Save();
+					if (auto name_it = names.find(index); name_it != names.end())
+					{
+						resource_manager.name_map()[res_id] = utf8_to_mac_roman(name_it->second);
+					}
 				}
 			}
 		}
@@ -309,6 +370,7 @@ void MergePICTs(marathon::ResourceManager& resource_manager,
 
 void MergeSnds(marathon::ResourceManager& resource_manager, const fs::path& path)
 {
+	auto names = ReadNames(path / "Resource Names.txt");
 	for (const auto& dir_entry : fs::directory_iterator{path})
 	{
 		if (dir_entry.is_regular_file())
@@ -321,7 +383,12 @@ void MergeSnds(marathon::ResourceManager& resource_manager, const fs::path& path
 				SndResource snd;
 				if (snd.Import(dir_entry.path()))
 				{
-					resource_manager.resource_map()[std::make_pair(FOUR_CHARS_TO_INT('s','n','d',' '), index)] = snd.Save();
+					auto res_id = std::make_pair(FOUR_CHARS_TO_INT('s','n','d',' '), index);
+					resource_manager.resource_map()[res_id] = snd.Save();
+					if (auto name_it = names.find(index); name_it != names.end())
+					{
+						resource_manager.name_map()[res_id] = utf8_to_mac_roman(name_it->second);
+					}
 				}
 			}
 		}
@@ -331,6 +398,7 @@ void MergeSnds(marathon::ResourceManager& resource_manager, const fs::path& path
 void MergeTEXTs(marathon::ResourceManager& resource_manager,
 				const fs::path& path)
 {
+	auto names = ReadNames(path / "Resource Names.txt");
 	for (const auto& dir_entry : fs::directory_iterator{path})
 	{
 		if (dir_entry.is_regular_file())
@@ -340,7 +408,13 @@ void MergeTEXTs(marathon::ResourceManager& resource_manager,
 			s >> index;
 			if (!s.fail())
 			{
-				resource_manager.resource_map()[std::make_pair(FOUR_CHARS_TO_INT('T','E','X','T'), index)] = ReadFile(dir_entry);
+				auto res_id = std::make_pair(FOUR_CHARS_TO_INT('T','E','X','T'), index);
+				resource_manager.resource_map()[res_id] = ReadFile(dir_entry);
+
+				if (auto name_it = names.find(index); name_it != names.end())
+				{
+					resource_manager.name_map()[res_id] = utf8_to_mac_roman(name_it->second);
+				}
 			}
 		}
 	}	
@@ -374,6 +448,7 @@ static std::vector<uint8_t> convert_m1_term(const std::string& m1_term)
 void MergeM1Terms(marathon::ResourceManager& resource_manager,
 				  const fs::path& path)
 {
+	auto names = ReadNames(path / "Resource Names.txt");
 	for (const auto& dir_entry : fs::directory_iterator{path})
 	{
 		if (dir_entry.is_regular_file())
@@ -390,7 +465,13 @@ void MergeM1Terms(marathon::ResourceManager& resource_manager,
 				std::string m1_term(length, '\0');
 				infile.read(m1_term.data(), m1_term.size());
 
-				resource_manager.resource_map()[std::make_pair(FOUR_CHARS_TO_INT('t','e','r','m'), index)] = convert_m1_term(m1_term);
+				auto res_id = std::make_pair(FOUR_CHARS_TO_INT('t','e','r','m'), index);
+				resource_manager.resource_map()[res_id] = convert_m1_term(m1_term);
+
+				if (auto name_it = names.find(index); name_it != names.end())
+				{
+					resource_manager.name_map()[res_id] = utf8_to_mac_roman(name_it->second);
+				}
 			}
 		}
 	}
@@ -399,6 +480,7 @@ void MergeM1Terms(marathon::ResourceManager& resource_manager,
 void MergeResourceDir(marathon::ResourceManager& resource_manager,
 					  const fs::path& path)
 {
+	auto names = ReadNames(path / "Resource Names.txt");
 	try
 	{
 		uint32_t res_type = std::stoul(path.filename(), nullptr, 16);
@@ -409,7 +491,13 @@ void MergeResourceDir(marathon::ResourceManager& resource_manager,
 			s >> index;
 			if (!s.fail())
 			{
-				resource_manager.resource_map()[std::make_pair(res_type, index)] = ReadFile(dir_entry);
+				auto res_id = std::make_pair(res_type, index);
+				resource_manager.resource_map()[res_id] = ReadFile(dir_entry);
+
+				if (auto name_it = names.find(index); name_it != names.end())
+				{
+					resource_manager.name_map()[res_id] = utf8_to_mac_roman(name_it->second);
+				}
 			}
 		}
 	}
@@ -455,32 +543,6 @@ void MergeResources(marathon::ResourceManager& resource_manager,
 	}
 }
 
-static std::string get_line(std::istream& stream)
-{
-	std::string line;
-	char c;
-	stream.get(c);
-	while (!stream.eof() && c != '\n' && c != '\r')
-	{
-		if (c == '\r')
-		{
-			if (!stream.eof() && stream.peek() == '\n')
-			{
-				stream.ignore(1);
-			}
-		}
-		else if (c != '\n' && c != '\0')
-		{
-			line += c;
-		}
-
-		stream.get(c);
-
-	};
-
-	return line;
-}
-
 void atque::merge(const fs::path& src, const fs::path& dest, std::ostream& log)
 {
 	if (!fs::exists(src))
@@ -518,25 +580,6 @@ void atque::merge(const fs::path& src, const fs::path& dest, std::ostream& log)
 	}
 
 	marathon::Wadfile wadfile;
-	
-	fs::path level_select_path(src);
-	level_select_path = level_select_path / "Level Select Names.txt";
-	
-	std::map<int16, std::string> level_select_names;
-	if (fs::exists(level_select_path))
-	{
-		std::ifstream s(level_select_path.string().c_str());
-		while (!s.eof() && !s.fail())
-		{
-			int16 index;
-			s >> index;
-			if (!s.fail())
-			{
-				s.ignore();
-				level_select_names[index] = get_line(s);
-			}
-		}
-	}
 
 	for (const auto& dir_entry : fs::directory_iterator{src})
 	{
@@ -567,7 +610,8 @@ void atque::merge(const fs::path& src, const fs::path& dest, std::ostream& log)
 		}
 	}
 
-	for (std::map<int16, std::string>::iterator it = level_select_names.begin(); it != level_select_names.end(); ++it)
+	auto level_select_names = ReadNames(src / "Level Select Names.txt");
+	for (auto it = level_select_names.begin(); it != level_select_names.end(); ++it)
 	{
 		if (wadfile.HasWad(it->first))
 		{
@@ -575,7 +619,7 @@ void atque::merge(const fs::path& src, const fs::path& dest, std::ostream& log)
 		}
 	}
 
-	wadfile.file_name(utf8_to_mac_roman(fs::path(dest).stem().u8string()));
+	wadfile.file_name(utf8_to_mac_roman(dest.stem().u8string()));
 
 	if (resource_manager.CanSaveToResourceFork())
 	{
