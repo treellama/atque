@@ -383,7 +383,7 @@ void atque::split(const fs::path& src, const fs::path& dest, std::ostream& log)
 					SavePhysics(wad, actual_level, physics_path);
 					
 					auto shapes_path = destfolder;
-					shapes_path = fs::u8path(mac_roman_to_utf8(actual_level));
+					shapes_path /= fs::u8path(mac_roman_to_utf8(actual_level));
 					shapes_path += ".ShPa";
 					SaveShapes(wad, shapes_path);
 					
