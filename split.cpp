@@ -413,11 +413,11 @@ void atque::split(const fs::path& src, const fs::path& dest, std::ostream& log)
 			}				
 		}
 	}
-	else
+	else if (data_fork->size())
 	{
 		fs::path data_fork_path(dest);
 		data_fork_path = data_fork_path / "Data.bin";
-		std::ofstream s{data_fork_path.string().c_str(), std::ios::out | std::ios::binary | std::ios::trunc};
+		std::ofstream s{data_fork_path.string().c_str(), std::ios::binary | std::ios::trunc};
 		s.write(reinterpret_cast<char*>(data_fork->data()), data_fork->size());
 	}
 
