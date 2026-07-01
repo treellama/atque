@@ -20,9 +20,10 @@
 		AE789D7C1539FF320044022B /* MapInfoChunk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE789D6E1539FF320044022B /* MapInfoChunk.cpp */; };
 		AE789D7D1539FF320044022B /* ScriptChunk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE789D701539FF320044022B /* ScriptChunk.cpp */; };
 		AE789D7E1539FF320044022B /* TerminalChunk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE789D721539FF320044022B /* TerminalChunk.cpp */; };
-		AE789D7F1539FF320044022B /* Unimap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE789D741539FF320044022B /* Unimap.cpp */; };
 		AE789D801539FF320044022B /* Wad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE789D761539FF320044022B /* Wad.cpp */; };
 		AE789D811539FF320044022B /* Wadfile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE789D781539FF320044022B /* Wadfile.cpp */; };
+		AE7B98442FEB76C600EDA16D /* MacBinaryII.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE7B98412FEB76C600EDA16D /* MacBinaryII.cpp */; };
+		AE7B98452FEB76C600EDA16D /* ResourceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE7B98432FEB76C600EDA16D /* ResourceManager.cpp */; };
 		AEADAC822686957900DB3270 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AEADAC812686957900DB3270 /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
 
