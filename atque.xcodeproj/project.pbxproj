@@ -3,11 +3,10 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 45;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AE16C0230E760F4800710B6E /* atque.icns in Resources */ = {isa = PBXBuildFile; fileRef = AE16C0220E760F4800710B6E /* atque.icns */; };
 		AE175F470E74BAAA005BE1E9 /* atque.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F360E74BAAA005BE1E9 /* atque.cpp */; };
 		AE175F480E74BAAA005BE1E9 /* CLUTResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F380E74BAAA005BE1E9 /* CLUTResource.cpp */; };
 		AE175F490E74BAAA005BE1E9 /* EasyBMP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F3A0E74BAAA005BE1E9 /* EasyBMP.cpp */; };
@@ -15,6 +14,7 @@
 		AE175F4B0E74BAAA005BE1E9 /* PICTResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F410E74BAAA005BE1E9 /* PICTResource.cpp */; };
 		AE175F4C0E74BAAA005BE1E9 /* SndResource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F430E74BAAA005BE1E9 /* SndResource.cpp */; };
 		AE175F4D0E74BAAA005BE1E9 /* split.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE175F450E74BAAA005BE1E9 /* split.cpp */; };
+		AE6238612FF5EE820056656E /* atque.icon in Resources */ = {isa = PBXBuildFile; fileRef = AE6238602FF5EE820056656E /* atque.icon */; };
 		AE789D7A1539FF320044022B /* AStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE789D691539FF320044022B /* AStream.cpp */; };
 		AE789D7B1539FF320044022B /* macroman.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE789D6C1539FF320044022B /* macroman.cpp */; };
 		AE789D7C1539FF320044022B /* MapInfoChunk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE789D6E1539FF320044022B /* MapInfoChunk.cpp */; };
@@ -41,7 +41,6 @@
 
 /* Begin PBXFileReference section */
 		AE13A90723C1051D0038E387 /* Atque.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Atque.entitlements; sourceTree = "<group>"; };
-		AE16C0220E760F4800710B6E /* atque.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = atque.icns; sourceTree = "<group>"; };
 		AE175F2E0E74BA63005BE1E9 /* Atque.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Atque.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE175F310E74BA63005BE1E9 /* Atque-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Atque-Info.plist"; sourceTree = "<group>"; };
 		AE175F360E74BAAA005BE1E9 /* atque.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = atque.cpp; sourceTree = "<group>"; };
@@ -61,6 +60,7 @@
 		AE175F440E74BAAA005BE1E9 /* SndResource.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SndResource.h; sourceTree = "<group>"; };
 		AE175F450E74BAAA005BE1E9 /* split.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = split.cpp; sourceTree = "<group>"; };
 		AE175F460E74BAAA005BE1E9 /* split.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = split.h; sourceTree = "<group>"; };
+		AE6238602FF5EE820056656E /* atque.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = atque.icon; sourceTree = "<group>"; };
 		AE789D691539FF320044022B /* AStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AStream.cpp; path = ferro/AStream.cpp; sourceTree = "<group>"; };
 		AE789D6A1539FF320044022B /* AStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AStream.h; path = ferro/AStream.h; sourceTree = "<group>"; };
 		AE789D6B1539FF320044022B /* cstypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cstypes.h; path = ferro/cstypes.h; sourceTree = "<group>"; };
@@ -72,12 +72,14 @@
 		AE789D711539FF320044022B /* ScriptChunk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScriptChunk.h; path = ferro/ScriptChunk.h; sourceTree = "<group>"; };
 		AE789D721539FF320044022B /* TerminalChunk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TerminalChunk.cpp; path = ferro/TerminalChunk.cpp; sourceTree = "<group>"; };
 		AE789D731539FF320044022B /* TerminalChunk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TerminalChunk.h; path = ferro/TerminalChunk.h; sourceTree = "<group>"; };
-		AE789D741539FF320044022B /* Unimap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Unimap.cpp; path = ferro/Unimap.cpp; sourceTree = "<group>"; };
-		AE789D751539FF320044022B /* Unimap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Unimap.h; path = ferro/Unimap.h; sourceTree = "<group>"; };
 		AE789D761539FF320044022B /* Wad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Wad.cpp; path = ferro/Wad.cpp; sourceTree = "<group>"; };
 		AE789D771539FF320044022B /* Wad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Wad.h; path = ferro/Wad.h; sourceTree = "<group>"; };
 		AE789D781539FF320044022B /* Wadfile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Wadfile.cpp; path = ferro/Wadfile.cpp; sourceTree = "<group>"; };
 		AE789D791539FF320044022B /* Wadfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Wadfile.h; path = ferro/Wadfile.h; sourceTree = "<group>"; };
+		AE7B98402FEB76C600EDA16D /* MacBinaryII.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MacBinaryII.h; sourceTree = "<group>"; };
+		AE7B98412FEB76C600EDA16D /* MacBinaryII.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MacBinaryII.cpp; sourceTree = "<group>"; };
+		AE7B98422FEB76C600EDA16D /* ResourceManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ResourceManager.h; sourceTree = "<group>"; };
+		AE7B98432FEB76C600EDA16D /* ResourceManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ResourceManager.cpp; sourceTree = "<group>"; };
 		AEADAC812686957900DB3270 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -96,7 +98,6 @@
 		AE16C01D0E760F1400710B6E /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				AE16C0220E760F4800710B6E /* atque.icns */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -115,10 +116,14 @@
 				AE175F3C0E74BAAA005BE1E9 /* EasyBMP_BMP.h */,
 				AE175F3D0E74BAAA005BE1E9 /* EasyBMP_DataStructures.h */,
 				AE175F3E0E74BAAA005BE1E9 /* EasyBMP_VariousBMPutilities.h */,
+				AE7B98412FEB76C600EDA16D /* MacBinaryII.cpp */,
+				AE7B98402FEB76C600EDA16D /* MacBinaryII.h */,
 				AE175F3F0E74BAAA005BE1E9 /* merge.cpp */,
 				AE175F400E74BAAA005BE1E9 /* merge.h */,
 				AE175F410E74BAAA005BE1E9 /* PICTResource.cpp */,
 				AE175F420E74BAAA005BE1E9 /* PICTResource.h */,
+				AE7B98432FEB76C600EDA16D /* ResourceManager.cpp */,
+				AE7B98422FEB76C600EDA16D /* ResourceManager.h */,
 				AE175F430E74BAAA005BE1E9 /* SndResource.cpp */,
 				AE175F440E74BAAA005BE1E9 /* SndResource.h */,
 				AE175F450E74BAAA005BE1E9 /* split.cpp */,
@@ -127,6 +132,7 @@
 				AE16C01D0E760F1400710B6E /* Resources */,
 				AE175F310E74BA63005BE1E9 /* Atque-Info.plist */,
 				AEADAC802686957800DB3270 /* Frameworks */,
+				AE6238602FF5EE820056656E /* atque.icon */,
 			);
 			sourceTree = "<group>";
 		};
@@ -152,8 +158,6 @@
 				AE789D711539FF320044022B /* ScriptChunk.h */,
 				AE789D721539FF320044022B /* TerminalChunk.cpp */,
 				AE789D731539FF320044022B /* TerminalChunk.h */,
-				AE789D741539FF320044022B /* Unimap.cpp */,
-				AE789D751539FF320044022B /* Unimap.h */,
 				AE789D761539FF320044022B /* Wad.cpp */,
 				AE789D771539FF320044022B /* Wad.h */,
 				AE789D781539FF320044022B /* Wadfile.cpp */,
@@ -225,7 +229,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AE16C0230E760F4800710B6E /* atque.icns in Resources */,
+				AE6238612FF5EE820056656E /* atque.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,8 +251,9 @@
 				AE789D7B1539FF320044022B /* macroman.cpp in Sources */,
 				AE789D7C1539FF320044022B /* MapInfoChunk.cpp in Sources */,
 				AE789D7D1539FF320044022B /* ScriptChunk.cpp in Sources */,
+				AE7B98442FEB76C600EDA16D /* MacBinaryII.cpp in Sources */,
+				AE7B98452FEB76C600EDA16D /* ResourceManager.cpp in Sources */,
 				AE789D7E1539FF320044022B /* TerminalChunk.cpp in Sources */,
-				AE789D7F1539FF320044022B /* Unimap.cpp in Sources */,
 				AE789D801539FF320044022B /* Wad.cpp in Sources */,
 				AE789D811539FF320044022B /* Wadfile.cpp in Sources */,
 			);
@@ -263,6 +268,7 @@
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				COPY_PHASE_STRIP = NO;
 				ENABLE_TESTABILITY = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;
@@ -272,12 +278,15 @@
 			buildSettings = {
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				COPY_PHASE_STRIP = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 			};
 			name = Release;
 		};
 		AE175F330E74BA64005BE1E9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = atque;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = Atque.entitlements;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
@@ -307,7 +316,7 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				"LIBRARY_SEARCH_PATHS[arch=arm64]" = "$(SRCROOT)/vcpkg/installed-arm64-osx/arm64-osx/lib";
 				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = "$(SRCROOT)/vcpkg/installed-x64-osx/x64-osx/lib";
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = 1.1.3;
 				OTHER_CFLAGS = (
 					"-D_FILE_OFFSET_BITS=64",
@@ -361,6 +370,8 @@
 		AE175F340E74BA64005BE1E9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = atque;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = Atque.entitlements;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
@@ -388,7 +399,7 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				"LIBRARY_SEARCH_PATHS[arch=arm64]" = "$(SRCROOT)/vcpkg/installed-arm64-osx/arm64-osx/lib";
 				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = "$(SRCROOT)/vcpkg/installed-x64-osx/x64-osx/lib";
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MARKETING_VERSION = 1.1.3;
 				OTHER_CFLAGS = (
 					"-D_FILE_OFFSET_BITS=64",
