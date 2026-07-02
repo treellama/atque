@@ -52,7 +52,7 @@ END_EVENT_TABLE();
 
 void AtqueWindow::OnAbout(wxCommandEvent &event)
 {
-    wxMessageBox(wxT("Atque 1.1.3 (C) 2008-2020 Gregory Smith\n\nAtque is licensed under the GNU GPL. See COPYING.txt"), wxT("About Atque"), wxOK);
+    wxMessageBox(wxT("Atque 2.0 (C) 2008-2026 Gregory Smith\n\nAtque is licensed under the GNU GPL. See COPYING.txt"), wxT("About Atque"), wxOK);
 }
 
 
@@ -83,7 +83,7 @@ void AtqueWindow::OnSplit(wxCommandEvent &event)
 						    wxT("Choose file"),
 						    Directory,
 						    wxT(""),
-						    wxT("Scenario files|*.sceA;*.imgA|All files|*.*"),
+						    wxT("Scenario files|*.sceA;*.imgA;*.sndz;*.appl|All files|*.*"),
 						    wxFD_OPEN);
     if (openFileDialog->ShowModal() == wxID_OK)
     {

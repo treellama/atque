@@ -292,7 +292,7 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1.1.3;
+				CURRENT_PROJECT_VERSION = 2.0;
 				DEVELOPMENT_TEAM = E8K89CXZE7;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -313,11 +313,12 @@
 					$SRCROOT,
 				);
 				INFOPLIST_FILE = "Atque-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INSTALL_PATH = "$(HOME)/Applications";
 				"LIBRARY_SEARCH_PATHS[arch=arm64]" = "$(SRCROOT)/vcpkg/installed-arm64-osx/arm64-osx/lib";
 				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = "$(SRCROOT)/vcpkg/installed-x64-osx/x64-osx/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.1.3;
+				MARKETING_VERSION = 2.0;
 				OTHER_CFLAGS = (
 					"-D_FILE_OFFSET_BITS=64",
 					"-D__WXMAC__",
@@ -360,7 +361,7 @@
 					"-lsndfile",
 					"-llzma",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.alephone.Atque;
+				PRODUCT_BUNDLE_IDENTIFIER = org.treellama.Atque;
 				PRODUCT_NAME = Atque;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
@@ -377,7 +378,7 @@
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = YES;
-				CURRENT_PROJECT_VERSION = 1.1.3;
+				CURRENT_PROJECT_VERSION = 2.0;
 				DEVELOPMENT_TEAM = E8K89CXZE7;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
@@ -396,11 +397,12 @@
 					$SRCROOT,
 				);
 				INFOPLIST_FILE = "Atque-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INSTALL_PATH = "$(HOME)/Applications";
 				"LIBRARY_SEARCH_PATHS[arch=arm64]" = "$(SRCROOT)/vcpkg/installed-arm64-osx/arm64-osx/lib";
 				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = "$(SRCROOT)/vcpkg/installed-x64-osx/x64-osx/lib";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.1.3;
+				MARKETING_VERSION = 2.0;
 				OTHER_CFLAGS = (
 					"-D_FILE_OFFSET_BITS=64",
 					"-D__WXMAC__",
@@ -443,7 +445,7 @@
 					"-lsndfile",
 					"-llzma",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.alephone.Atque;
+				PRODUCT_BUNDLE_IDENTIFIER = org.treellama.Atque;
 				PRODUCT_NAME = Atque;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;

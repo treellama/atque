@@ -1,4 +1,4 @@
-AC_INIT(atque, 1.1.3, [https://github.com/treellama/atque/issues], atque, [https://github.com/treellama/atque] )
+AC_INIT(atque, 2.0, [https://codeberg.org/treellama/atque/issues], atque, [https://codeberg.org/treellama/atque] )
 
 AC_CONFIG_MACRO_DIR([m4])
 AC_PREREQ([2.59])
